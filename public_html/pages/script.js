@@ -1,81 +1,105 @@
-/**
- * Logic Hệ thống Tìm kiếm Real-time & Lọc sản phẩm theo Thể loại
- */
 document.addEventListener("DOMContentLoaded", function () {
+    // 1. LẤY CÁC PHẦN TỬ GIAO DIỆN
     const searchDesktop = document.getElementById("searchDesktop");
     const searchMobile = document.getElementById("searchMobile");
-    const categoryButtons = document.querySelectorAll(".category-btn");
+    const filterButtons = document.querySelectorAll(".btn-filter"); // Nút ngoài trang chủ
+    const categoryButtons = document.querySelectorAll(".category-btn"); // Nút trong menu trái
     const bookItems = document.querySelectorAll(".book-item");
-    const filterBadge = document.getElementById("filterBadge");
-    const noResultAlert = document.getElementById("noResultAlert");
-    const offcanvasElement = document.getElementById("menuBaGach");
-    
-    let currentCategory = "all"; // Trạng thái bộ lọc thể loại mặc định
 
-    // Hàm tổng hợp kiểm tra chéo hai điều kiện lọc
+    // Biến lưu trạng thái lọc hiện tại (mặc định là 'all')
+    let currentCategory = "all";
+
+    // 2. HÀM XỬ LÝ LỌC VÀ TÌM KIẾM TỔNG HỢP
     function filterBooks() {
-        // Lấy từ khóa chữ thường từ ô nhập liệu hiện tại
-        const keyword = (searchDesktop.value || searchMobile.value).toLowerCase().trim();
-        let visibleCount = 0;
+        // Lấy từ khóa tìm kiếm (ưu tiên ô đang được gõ, chuyển về chữ thường, bỏ khoảng trắng thừa)
+        const keyword = (searchDesktop.value || searchMobile.value || "").toLowerCase().trim();
 
-        bookItems.forEach(item => {
-            const itemCategory = item.getAttribute("data-category");
+        bookItems.forEach((item) => {
             const bookName = item.querySelector(".book-name").textContent.toLowerCase();
             const bookAuthor = item.querySelector(".book-author").textContent.toLowerCase();
+            const bookCategory = item.getAttribute("data-category");
 
-            // Kiểm tra khớp Thể loại và khớp Từ khóa (Tên sách hoặc Tác giả)
-            const matchesCategory = (currentCategory === "all" || itemCategory === currentCategory);
-            const matchesKeyword = bookName.includes(keyword) || bookAuthor.includes(keyword);
+            // Điều kiện 1: Khớp thể loại (Nếu là 'all' thì luôn đúng, ngược lại phải trùng mã thể loại)
+            const matchesCategory = (currentCategory === "all" || bookCategory === currentCategory);
 
+            // Điều kiện 2: Khớp từ khóa tìm kiếm (Tên sách hoặc Tên tác giả chứa từ khóa)
+            const matchesKeyword = (bookName.includes(keyword) || bookAuthor.includes(keyword));
+
+            // Nếu thỏa mãn cả 2 điều kiện thì hiển thị, ngược lại ẩn đi
             if (matchesCategory && matchesKeyword) {
-                item.classList.remove("d-none");
-                visibleCount++;
+                item.style.setProperty("display", "block", "important");
             } else {
-                item.classList.add("d-none");
+                item.style.setProperty("display", "none", "important");
             }
         });
-
-        // Hiển thị alert nếu không có sách thỏa mãn điều kiện
-        if (visibleCount === 0) {
-            noResultAlert.classList.remove("d-none");
-        } else {
-            noResultAlert.classList.add("d-none");
-        }
     }
 
-    // Sự kiện gõ trên thanh tìm kiếm Desktop
-    searchDesktop.addEventListener("input", function() {
-        searchMobile.value = this.value; // Đồng bộ text sang mobile
-        filterBooks();
-    });
+    // 3. ĐỒNG BỘ HAI Ô TÌM KIẾM KHÔNG BỊ LỆCH NHAU
+    if (searchDesktop && searchMobile) {
+        searchDesktop.addEventListener("input", function () {
+            searchMobile.value = searchDesktop.value; // Đồng bộ chữ sang ô Mobile
+            filterBooks();
+        });
 
-    // Sự kiện gõ trên thanh tìm kiếm Mobile
-    searchMobile.addEventListener("input", function() {
-        searchDesktop.value = this.value; // Đồng bộ text sang desktop
-        filterBooks();
-    });
+        searchMobile.addEventListener("input", function () {
+            searchDesktop.value = searchMobile.value; // Đồng bộ chữ sang ô Desktop
+            filterBooks();
+        });
+    }
 
-    // Sự kiện chọn Danh mục Thể loại
-    categoryButtons.forEach(button => {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
+    // 4. BỘ LỌC NÚT BẤM NGOÀI TRANG CHỦ
+    filterButtons.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            // Thay đổi màu nút đang chọn
+            filterButtons.forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+
+            // Cập nhật thể loại và chạy bộ lọc
+            currentCategory = this.getAttribute("data-target");
             
+            // Đồng bộ trạng thái active sang cả Menu trái (nếu có trùng danh mục)
+            syncMenuLeft(currentCategory);
+            
+            filterBooks();
+        });
+    });
+
+    // 5. BỘ LỌC TRONG THANH MENU TRÁI (OFFCANVAS)
+    categoryButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault(); // Ngăn trang web bị cuộn lên đầu khi bấm thẻ <a>
+
             currentCategory = this.getAttribute("data-filter");
-            const categoryName = this.textContent.trim();
+
+            // Đồng bộ trạng thái active ra nút ngoài trang chủ
+            filterButtons.forEach((b) => {
+                if (b.getAttribute("data-target") === currentCategory) {
+                    b.classList.add("active");
+                    b.scrollIntoView({ behavior: "smooth", block: "nearest" }); // Cuộn màn hình nhẹ đến nút đó
+                } else {
+                    b.classList.remove("active");
+                }
+            });
 
             filterBooks();
 
-            // Cập nhật Badge giao diện thông báo thể loại
-            if (currentCategory === "all") {
-                filterBadge.classList.add("d-none");
-            } else {
-                filterBadge.textContent = categoryName;
-                filterBadge.classList.remove("d-none");
-            }
-
-            // Tự động thu hồi thanh menu Offcanvas sau khi chọn
+            // Tự động đóng Menu trái sau khi chọn xong (Tăng trải nghiệm mobile)
+            const offcanvasElement = document.getElementById("menuBaGach");
             const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
-            if (bsOffcanvas) bsOffcanvas.hide();
+            if (bsOffcanvas) {
+                bsOffcanvas.hide();
+            }
         });
     });
+
+    // Hàm phụ trợ đồng bộ active từ ngoài vào Menu trái
+    function syncMenuLeft(category) {
+        categoryButtons.forEach((btn) => {
+            if (btn.getAttribute("data-filter") === category) {
+                btn.classList.add("text-primary", "fw-bold");
+            } else {
+                btn.classList.remove("text-primary", "fw-bold");
+            }
+        });
+    }
 });
