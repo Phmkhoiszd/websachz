@@ -1,0 +1,12 @@
+/* Custom CSS cho Sách Không Ngủ */
+
+.custom-card-img {
+    height: 280px; /* Chiều cao cố định cho mọi ảnh sách */
+    object-fit: cover; /* Giữ nguyên tỷ lệ, tự động cắt ảnh vừa khung không bị méo */
+    object-position: center;
+}
+
+/* Hiệu ứng mượt mà khi chuyển đổi ẩn/hiện sách */
+.book-item {
+    transition: all 0.3s ease;
+}
