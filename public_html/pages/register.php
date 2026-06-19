@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tài Khoản - Sách Không Ngủ</title>
+    <title>Đăng Ký Tài Khoản </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="card register-card border-0 bg-white p-4">
             <div class="text-center mb-4">
                 <a href="index.php" class="text-decoration-none text-dark">
-                    <h3 class="fw-bold text-uppercase tracking-wider m-0">Sách Không Ngủ</h3>
+                    <h3 class="fw-bold text-uppercase tracking-wider m-0">World of Book</h3>
                     <small class="text-muted">Đăng ký thành viên mới</small>
                 </a>
             </div>
@@ -121,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </label>
                 </div>
 
-                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3" style="border-radius: 8px;">ĐĂNG KÝ TÀI KHOẢN</button>
+                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3" style="border-radius: 8px;">Đăng ký</button>
                 
                 <p class="text-center small text-muted mb-0">
                     Đã có tài khoản rồi? <a href="login.php" class="fw-bold text-decoration-none text-primary">Đăng nhập ngay</a>

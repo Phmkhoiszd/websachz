@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="card login-card border-0 bg-white p-4">
             <div class="text-center mb-4">
                 <a href="index.php" class="text-decoration-none text-dark">
-                    <h3 class="fw-bold text-uppercase tracking-wider m-0">Sách Không Ngủ</h3>
+                    <h3 class="fw-bold text-uppercase tracking-wider m-0">World of Book</h3>
                     <small class="text-muted">Hệ thống đăng nhập thành viên</small>
                 </a>
             </div>
@@ -110,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3" style="border-radius: 8px;">ĐĂNG NHẬP</button>
+                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3" style="border-radius: 8px;">Đăng Nhập</button>
                 
                 <p class="text-center small text-muted mb-0">
                     Chưa có tài khoản? <a href="register.php" class="fw-bold text-decoration-none text-primary">Đăng ký ngay</a>
