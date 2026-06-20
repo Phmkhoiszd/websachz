@@ -30,12 +30,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
             // Chèn dữ liệu tài khoản mới vào bảng Users
-            $stmt_insert = $conn->prepare("INSERT INTO Users (username, email, password_hash, full_name) VALUES (:username, :email, :password_hash, :full_name)");
+            $stmt_insert = $conn->prepare("INSERT INTO Users (username, email, password_hash, full_name, role) VALUES (:username, :email, :password_hash, :full_name, :role)");
             $stmt_insert->execute([
                 'username' => $user,
                 'email' => $email,
                 'password_hash' => $hashed_password,
-                'full_name' => $user // Mặc định lấy username làm Tên hiển thị ban đầu
+                'full_name' => $user, // Mặc định lấy username làm Tên hiển thị ban đầu
+                'role' => 'user' // Vai trò mặc định cho người dùng mới là 'user'
             ]);
 
             $success_message = "Đăng ký thành công! Đang chuyển hướng sang trang đăng nhập...";

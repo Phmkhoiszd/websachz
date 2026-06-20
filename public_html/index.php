@@ -1,15 +1,14 @@
 <?php
-// 1. Khởi động Session đầu tiên để quản lý trạng thái đăng nhập của thành viên
 session_start();
 
-// 2. Cấu hình kết nối Database bằng PDO - Sử dụng chính xác dbname của bạn là 'worldofbook'
+// 2. Cấu hình kết nối Database bằng PDO
 $host = 'localhost';
 $dbname = 'worldofbook'; 
-$username = 'root'; // Mặc định của XAMPP
-$password = '';     // Mặc định của XAMPP trống
+$username = 'root';
+$password = '';
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password); // Kết nối Database
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Kết nối Database thất bại: " . $e->getMessage());
@@ -27,6 +26,15 @@ $query_books = "SELECT Books.*, Categories.category_slug
 $stmt_books = $conn->prepare($query_books);
 $stmt_books->execute();
 $books = $stmt_books->fetchAll(PDO::FETCH_ASSOC);
+
+$cartCount = 0;
+$cartPreview = [];
+if (isset($_SESSION['user_id'])) {
+    $stmt_cart = $conn->prepare("SELECT c.quantity, b.book_name, b.price, b.image_path FROM carts c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = ?");
+    $stmt_cart->execute([$_SESSION['user_id']]);
+    $cartPreview = $stmt_cart->fetchAll(PDO::FETCH_ASSOC);
+    $cartCount = count($cartPreview);
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -73,17 +81,35 @@ $books = $stmt_books->fetchAll(PDO::FETCH_ASSOC);
                 <?php endif; ?>
 
                 <div class="position-relative cart-wrapper">
-                    <a href="#" class="btn btn-outline-light">
+                    <a href="pages/cart.php" class="btn btn-outline-light position-relative">
                         <i class="bi bi-cart3"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><?= $cartCount ?></span>
                     </a>
                     
                     <div class="cart-dropdown shadow rounded border">
                         <div class="cart-arrow"></div>
-                        <div class="p-4 text-center">
-                            <img src="images/emptycart.jpg" alt="Chưa có sản phẩm" class="img-fluid mb-3" style="width: 80px; opacity: 0.6; filter: grayscale(30%);">
-                            <p class="text-muted small mb-0 fw-bold">Chưa có sản phẩm</p>
-                        </div>
+                        <?php if ($cartCount > 0): ?>
+                            <div class="p-3">
+                                <h6 class="fw-bold mb-3">Giỏ hàng (<?= $cartCount ?>)</h6>
+                                <?php foreach ($cartPreview as $item): ?>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="<?= htmlspecialchars($item['image_path']) ?>" alt="" class="me-3" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small mb-1"><?= htmlspecialchars($item['book_name']) ?></div>
+                                            <div class="small text-muted">x<?= $item['quantity'] ?> • <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ</div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                                <div class="d-grid">
+                                    <a href="pages/cart.php" class="btn btn-primary btn-sm">Xem giỏ hàng</a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="p-4 text-center">
+                                <img src="images/emptycart.jpg" alt="Chưa có sản phẩm" class="img-fluid mb-3" style="width: 80px; opacity: 0.6; filter: grayscale(30%);">
+                                <p class="text-muted small mb-0 fw-bold">Chưa có sản phẩm</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -198,7 +224,10 @@ $books = $stmt_books->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                                 <div>
                                     <p class="card-text text-danger fw-bold mb-3"><?= number_format($book['price'], 0, ',', '.') ?>đ</p>
-                                    <button class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i> Thêm giỏ hàng</button>
+                                    <form method="POST" action="pages/add_to_cart.php">
+                                        <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
+                                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i> Thêm giỏ hàng</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -221,7 +250,7 @@ $books = $stmt_books->fetchAll(PDO::FETCH_ASSOC);
 
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
-            <p class="mb-0">&copy; 2026 World of Books.</p>
+            <p class="mb-0">&copy; World of Books.</p>
         </div>
     </footer>
 

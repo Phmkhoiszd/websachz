@@ -7,7 +7,7 @@ $error_message = "";
 // 2. Chỉ xử lý khi người dùng ấn nút ĐĂNG NHẬP (Gửi dữ liệu POST)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $host = 'localhost';
-    $dbname = 'worldofbook'; // ĐÃ SỬA THÀNH worldofbook
+    $dbname = 'worldofbook'; 
     $username_db = 'root';
     $password_db = '';
 
@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user_input = trim($_POST['username']);
         $password_input = $_POST['password'];
 
-        // Kiểm tra xem dữ liệu nhập vào là Username hay Email
-        $stmt = $conn->prepare("SELECT * FROM Users WHERE username = :user_input OR email = :user_input");
+        // Kiểm tra xem dữ liệu nhập vào là Username hay Email (Sử dụng hàm LOWER để tránh lệch chữ hoa thường)
+        $stmt = $conn->prepare("SELECT * FROM Users WHERE LOWER(username) = LOWER(:user_input) OR LOWER(email) = LOWER(:user_input)");
         $stmt->execute(['user_input' => $user_input]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -30,17 +30,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password_input, $user['password_hash'])) {
                 
                 // Lưu dữ liệu quan trọng của người dùng vào Session
-                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
-                // Nếu DB không có cột full_name, hệ thống tự động lấy cột username làm tên hiển thị
                 $_SESSION['full_name'] = isset($user['full_name']) ? $user['full_name'] : $user['username'];
-                $_SESSION['role'] = isset($user['role']) ? $user['role'] : 'user'; 
+                
+                // Chuẩn hóa role về chữ thường để so sánh chính xác
+                // Nếu role không tồn tại hoặc NULL, mặc định là 'user'
+                $user_role = (!empty($user['role'])) ? strtolower(trim($user['role'])) : 'user';
+                $_SESSION['role'] = $user_role; 
 
                 // Kiểm tra vai trò để điều hướng trang phù hợp
-                if ($_SESSION['role'] === 'admin') {
-                    header("Location: capnhat.php"); 
+                if ($user_role === 'admin') {
+                    header("Location: admin_orders.php");
                 } else {
-                    header("Location: index.php"); // SỬA: Quay về index.php cùng cấp
+                    header("Location: ../index.php"); 
                 }
                 exit();
             } else {
