@@ -224,10 +224,25 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
                                 <div>
                                     <p class="card-text text-danger fw-bold mb-3"><?= number_format($book['price'], 0, ',', '.') ?>đ</p>
-                                    <form method="POST" action="pages/add_to_cart.php">
-                                        <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
-                                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i> Thêm giỏ hàng</button>
-                                    </form>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm w-50 fw-bold" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#bookDetailModal"
+                                                data-id="<?= $book['book_id'] ?>"
+                                                data-name="<?= htmlspecialchars($book['book_name']) ?>"
+                                                data-author="<?= htmlspecialchars($book['author']) ?>"
+                                                data-price="<?= number_format($book['price'], 0, ',', '.') ?>đ"
+                                                data-image="<?= htmlspecialchars($book['image_path']) ?>">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </button>
+                                        
+                                        <form method="POST" action="pages/add_to_cart.php" class="w-50">
+                                            <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
+                                            <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold"><i class="bi bi-cart-plus"></i> Thêm</button>
+                                        </form>
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -248,6 +263,40 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
+    <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="bookDetailModalLabel"><i class="bi bi-info-circle me-2"></i>Thông tin chi tiết sách</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-5 text-center">
+                            <img id="modalBookImage" src="" alt="" class="img-fluid rounded shadow-sm" style="max-height: 320px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-7 d-flex flex-column justify-content-between">
+                            <div>
+                                <h3 class="fw-bold text-dark mb-2" id="modalBookName">Tên sách</h3>
+                                <p class="text-muted mb-3 fs-5"><strong>Tác giả:</strong> <span id="modalBookAuthor">...</span></p>
+                                <hr>
+                                <h4 class="text-danger fw-bold mb-4" id="modalBookPrice">0đ</h4>
+                                <p class="text-secondary small"><i class="bi bi-shield-check text-success me-1"></i> Sản phẩm được phân phối chính hãng trực tuyến bởi hệ thống cửa hàng <strong>World of Books</strong>.</p>
+                            </div>
+                            <div class="modal-footer border-0 p-0 mt-3 d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Đóng</button>
+                                <form method="POST" action="pages/add_to_cart.php" id="modalAddToCartForm">
+                                    <input type="hidden" name="book_id" id="modalBookId" value="">
+                                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ hàng</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
             <p class="mb-0">&copy; World of Books.</p>
@@ -256,5 +305,32 @@ if (isset($_SESSION['user_id'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="pages/script.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bookDetailModal = document.getElementById('bookDetailModal');
+        if (bookDetailModal) {
+            bookDetailModal.addEventListener('show.bs.modal', function (event) {
+                // Nút bấm kích hoạt Modal
+                const button = event.relatedTarget;
+                
+                // Trích xuất thông tin lưu ở thuộc tính data-*
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const author = button.getAttribute('data-author');
+                const price = button.getAttribute('data-price');
+                const image = button.getAttribute('data-image');
+
+                // Điền thông tin vào các thẻ trong Modal
+                document.getElementById('modalBookName').textContent = name;
+                document.getElementById('modalBookAuthor').textContent = author;
+                document.getElementById('modalBookPrice').textContent = price;
+                document.getElementById('modalBookImage').src = image;
+                document.getElementById('modalBookImage').alt = name;
+                document.getElementById('modalBookId').value = id;
+            });
+        }
+    });
+    </script>
 </body>
 </html>
