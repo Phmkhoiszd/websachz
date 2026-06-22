@@ -1,18 +1,8 @@
 <?php
 session_start();
 
-// 2. Cấu hình kết nối Database bằng PDO
-$host = 'localhost';
-$dbname = 'worldofbook'; 
-$username = 'root';
-$password = '';
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password); // Kết nối Database
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Kết nối Database thất bại: " . $e->getMessage());
-}
+// Nhúng file cấu hình kết nối database
+require_once __DIR__ . '/pages/config.php';
 
 // 3. Lấy danh sách Thể loại sách để đổ vào menu
 $stmt_categories = $conn->prepare("SELECT * FROM Categories");
@@ -45,160 +35,100 @@ if (isset($_SESSION['user_id'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="pages/style.css">
+    <link rel="stylesheet" href="pages/styles.css">
+    
     <style>
+        /* --- 1. Code sửa lỗi Flash Sale --- */
+        @keyframes flash-animation {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.4; transform: scale(0.95); }
+        }
+        .animation-flash {
+            animation: flash-animation 1.2s infinite ease-in-out;
+        }
+        .flash-sale-scroll {
+            display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem; padding-bottom: 10px;
+            scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+        }
+        .flash-sale-card { width: 190px; flex-shrink: 0; transition: transform 0.2s, box-shadow 0.2s; }
+        .flash-sale-card:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; }
+
+        /* --- 2. Sửa lỗi mất màu giảm giá & ảnh không đều --- */
         .badge-promo {
             position: absolute;
             top: 10px;
             left: 10px;
             background-color: #dc3545;
             color: white;
+            font-weight: bold;
             padding: 4px 8px;
             font-size: 12px;
-            font-weight: bold;
             border-radius: 4px;
-            z-index: 2;
-        }
-        .old-price {
-            text-decoration: line-through;
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-right: 5px;
-        }
-        /* Style sửa lỗi báo đỏ text-uppercase */
-        .filter-group-title {
-            font-size: 0.85rem;
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            color: #6c757d;
-            font-weight: bold;
-            margin-bottom: 8px;
+            z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Khối Flash Sale Tổng kiểu Shopee */
-        .flash-sale-container {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
+        .custom-card-img {
+            height: 240px;
+            width: 100%;
+            object-fit: cover;
+            object-position: center;
+            background-color: #f8f9fa;
         }
-        .flash-sale-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .flash-sale-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff4742;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        /* Đồng hồ đếm ngược */
-        .countdown-box {
-            display: inline-flex;
-            gap: 4px;
-            margin-left: 10px;
-        }
-        .countdown-time {
-            background-color: #000;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        /* Thanh cuộn ngang cho sản phẩm sale */
-        .flash-sale-slider {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 10px;
-        }
-        .flash-sale-slider::-webkit-scrollbar {
-            height: 6px;
-        }
-        .flash-sale-slider::-webkit-scrollbar-thumb {
-            background-color: #e0e0e0;
-            border-radius: 4px;
-        }
-        /* Card sản phẩm Flash Sale */
-        .flash-sale-item {
-            flex: 0 0 calc(16.666% - 13px);
-            min-width: 160px;
-            position: relative;
-            background: #fff;
-            border: 1px solid #f0f0f0;
-            border-radius: 4px;
-            padding: 8px;
+
+        .book-item .card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden; 
         }
-        /* Nhãn giảm giá chéo góc góc phải giống Shopee */
-        .shopee-badge-promo {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: rgba(255, 212, 36, 0.9);
-            color: #ec3818;
-            padding: 4px 6px;
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-            border-bottom-left-radius: 4px;
-            z-index: 3;
-        }
-        .shopee-badge-promo::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 4px solid rgba(255, 212, 36, 0.9);
-        }
-        /* Giá và thanh tiến trình SELLING FAST */
-        .flash-sale-price {
-            color: #ee4d2d;
-            font-size: 1.1rem;
-            font-weight: 500;
-            text-align: center;
-            margin-top: 8px;
-            margin-bottom: 4px;
-        }
-        .selling-fast-bar {
-            position: relative;
-            background-color: #ffbda6;
-            color: #fff;
-            border-radius: 10px;
-            height: 16px;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
+
+        .book-item .card-body {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            z-index: 1;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
         }
-        .selling-fast-progress {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, #ff5722, #ff7337);
-            z-index: -1;
-            border-radius: 10px;
+
+        /* --- LÀM ĐẸP THANH FILTER THỂ LOẠI --- */
+        .bg-light.p-3.rounded-3.shadow-sm.mb-4 {
+            background-color: #ffffff !important;
+            border: 1px solid #e9ecef;
+            padding: 1.25rem !important;
+        }
+
+        .d-inline-flex.gap-2 {
+            gap: 0.5rem 0.75rem !important;
+        }
+
+        .btn-filter {
+            padding: 6px 16px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            border-radius: 20px !important;
+            border: 1px solid #dee2e6 !important;
+            background-color: #f8f9fa !important;
+            color: #495057 !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+
+        .btn-filter:hover {
+            background-color: #e9ecef !important;
+            color: #0d6efd !important;
+            border-color: #0d6efd !important;
+        }
+
+        .btn-filter.active {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+            border-color: #0d6efd !important;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2) !important;
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
         <div class="container">
             <button class="btn btn-dark text-white me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuBaGach">
@@ -267,7 +197,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </nav>
 
-    <!-- OFFCANVAS MENU -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="menuBaGach" aria-labelledby="menuBaGachLabel">
         <div class="offcanvas-header bg-dark text-white">
             <h5 class="offcanvas-title fw-bold" id="menuBaGachLabel"><i class="bi bi-shop me-2"></i>DANH MỤC</h5>
@@ -307,15 +236,14 @@ if (isset($_SESSION['user_id'])) {
                 </button>
                 <div class="collapse bg-light" id="collapseHoTro">
                     <div class="list-group list-group-flush ps-3">
-                      <a href="pages/contact.php" class="list-group-item list-group-item-action bg-transparent py-2"><i class="bi bi-telephone text-primary me-2"></i>Liên hệ hỗ trợ</a>
-<a href="pages/introduce.php" class="list-group-item list-group-item-action bg-transparent py-2"><i class="bi bi-info-circle text-success me-2"></i>Giới thiệu điều khoản</a>
+                        <a href="pages/contact.php" class="list-group-item list-group-item-action bg-transparent py-2"><i class="bi bi-telephone text-primary me-2"></i>Liên hệ hỗ trợ</a>
+                        <a href="pages/introduce.php" class="list-group-item list-group-item-action bg-transparent py-2"><i class="bi bi-info-circle text-success me-2"></i>Giới thiệu điều khoản</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- HERO BANNER -->
     <div class="container my-4">
         <div class="row g-3">
             <div class="col-lg-8 col-12">
@@ -335,7 +263,7 @@ if (isset($_SESSION['user_id'])) {
                     <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide-prev>
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide-next>
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     </button>
                 </div>
@@ -352,88 +280,89 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- SECTION FLASH SALE (ĐÃ GIỮ LẠI THEO YÊU CẦU) -->
     <div class="container my-4">
-        <div class="flash-sale-container shadow-sm border">
-            <div class="flash-sale-header">
-                <div class="flash-sale-title">
-                    <i class="bi bi-lightning-fill text-danger fs-3"></i> FLASH SALE
-                    <div class="countdown-box">
-                        <span class="countdown-time" id="hours">01</span>
-                        <span class="countdown-time" id="minutes">45</span>
-                        <span class="countdown-time" id="seconds">07</span>
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-lightning-fill text-warning fs-4 animation-flash"></i> 
+                    <span class="fw-bold fs-5 m-0 text-uppercase">FLASH SALE</span>
+                    <div class="d-flex gap-1 align-items-center ms-2">
+                        <span class="badge bg-dark" id="hours">01</span>
+                        <b class="text-white">:</b>
+                        <span class="badge bg-dark" id="minutes">45</span>
+                        <b class="text-white">:</b>
+                        <span class="badge bg-dark" id="seconds">07</span>
                     </div>
                 </div>
-                <a href="#" class="text-danger text-decoration-none small fw-bold">Xem Tất Cả <i class="bi bi-chevron-right"></i></a>
+                <a href="#" class="text-white text-decoration-none small fw-bold">Xem Tất Cả <i class="bi bi-chevron-right"></i></a>
             </div>
+            
+            <div class="card-body p-3">
+                <div class="flash-sale-scroll">
+                    <?php 
+                    $flash_sales = array_filter($books, function($b) {
+                        return isset($b['discount_percent']) && $b['discount_percent'] > 0;
+                    });
 
-            <div class="flash-sale-slider">
-                <?php 
-                // Lọc ra sách có discount_percent > 0 để đưa vào hàng Flash Sale trượt ngang
-                $flash_sales = array_filter($books, function($b) {
-                    return isset($b['discount_percent']) && $b['discount_percent'] > 0;
-                });
+                    if (count($flash_sales) > 0):
+                        foreach ($flash_sales as $book): 
+                            $goc = $book['price'];
+                            $giam = $book['discount_percent'];
+                            $gia_ban = $goc - ($goc * $giam / 100);
+                            $percent_sold = rand(40, 90); 
+                    ?>
+                        <div class="card flash-sale-card shadow-sm border position-relative">
+                            <span class="position-absolute top-0 start-0 badge bg-warning text-dark fw-bold m-2" style="z-index:3;">
+                                -<?= $giam ?>%
+                            </span>
+                            
+                            <a href="#" class="p-2 d-block text-center" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
+                               data-id="<?= $book['book_id'] ?>"
+                               data-name="<?= htmlspecialchars($book['book_name']) ?>"
+                               data-author="<?= htmlspecialchars($book['author']) ?>"
+                               data-price="<?= number_format($gia_ban, 0, ',', '.') ?>đ"
+                               data-image="<?= htmlspecialchars($book['image_path']) ?>">
+                                <img src="<?= htmlspecialchars($book['image_path']) ?>" class="rounded object-fit-cover" style="height: 150px; width: 100%;" alt="<?= htmlspecialchars($book['book_name']) ?>">
+                            </a>
 
-                if (count($flash_sales) > 0):
-                    foreach ($flash_sales as $book): 
-                        $goc = $book['price'];
-                        $giam = $book['discount_percent'];
-                        $gia_ban = $goc - ($goc * $giam / 100);
-                        $percent_sold = rand(40, 90); 
-                ?>
-                    <div class="flash-sale-item shadow-sm">
-                        <div class="shopee-badge-promo">
-                            <div><i class="bi bi-lightning-fill"></i></div>
-                            <div>-<?= $giam ?>%</div>
-                        </div>
-                        
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
-                           data-id="<?= $book['book_id'] ?>"
-                           data-name="<?= htmlspecialchars($book['book_name']) ?>"
-                           data-author="<?= htmlspecialchars($book['author']) ?>"
-                           data-price="<?= number_format($gia_ban, 0, ',', '.') ?>đ"
-                           data-image="<?= htmlspecialchars($book['image_path']) ?>">
-                            <img src="<?= htmlspecialchars($book['image_path']) ?>" class="w-100 object-fit-cover mb-2" style="height: 150px; border-radius: 4px;" alt="<?= htmlspecialchars($book['book_name']) ?>">
-                        </a>
-
-                        <div>
-                            <div class="flash-sale-price">
-                                <?= number_format($gia_ban, 0, ',', '.') ?><span class="fs-6">đ</span>
+                            <div class="card-body p-2 text-center d-flex flex-column justify-content-between">
+                                <div class="text-truncate fw-bold small text-dark mb-1"><?= htmlspecialchars($book['book_name']) ?></div>
+                                <div>
+                                    <div class="text-danger fw-bold fs-5 mb-2">
+                                        <?= number_format($gia_ban, 0, ',', '.') ?><span class="fs-6">đ</span>
+                                    </div>
+                                    <div class="progress position-relative" style="height: 16px; border-radius: 10px;">
+                                        <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: <?= $percent_sold ?>%;"></div>
+                                        <small class="position-absolute w-100 start-0 text-center fw-bold text-white" style="font-size: 9px; line-height: 16px; z-index: 2; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">SELLING FAST</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="selling-fast-bar">
-                                <span class="position-relative" style="z-index: 2;">SELLING FAST</span>
-                                <div class="selling-fast-progress" style="width: <?= $percent_sold ?>%;"></div>
-                            </div>
                         </div>
-                    </div>
-                <?php 
-                    endforeach; 
-                else:
-                ?>
-                    <div class="text-center w-100 py-4 text-muted">Hiện tại chưa có chương trình Flash Sale nào.</div>
-                <?php endif; ?>
+                    <?php 
+                        endforeach; 
+                    else:
+                    ?>
+                        <div class="text-center w-100 py-4 text-muted">Hiện tại chưa có chương trình Flash Sale nào.</div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- KHU VỰC BỘ LỌC THỂ LOẠI VÀ GRID SÁCH -->
     <div class="container my-5">
         <h3 class="text-center fw-bold mb-4" id="sectionTitle">Sách nổi bật</h3>
         
-        <!-- CHỈ GIỮ LẠI LỌC THEO THỂ LOẠI -->
         <div class="bg-light p-3 rounded-3 shadow-sm mb-4">
             <div class="text-center">
-                <div class="filter-group-title"><i class="bi bi-bookmarks me-1"></i> Phân loại theo Thể loại</div>
                 <div class="d-inline-flex gap-2 flex-wrap justify-content-center">
-                    <button class="btn btn-sm btn-dark btn-filter active" data-target="all">Tất cả sách</button>
+                    <button class="btn btn-filter active" data-target="all">Tất cả sách</button>
                     <?php foreach ($categories as $cat): ?>
-                        <button class="btn btn-sm btn-outline-secondary btn-filter" data-target="<?= htmlspecialchars($cat['category_slug']) ?>"><?= htmlspecialchars($cat['category_name']) ?></button>
+                        <button class="btn btn-filter" data-target="<?= htmlspecialchars($cat['category_slug']) ?>"><?= htmlspecialchars($cat['category_name']) ?></button>
                     <?php endforeach; ?>
                 </div>
             </div>
         </div>
             
-        <!-- GRID SÁCH -->
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4" id="bookGrid">
             <?php if (count($books) > 0): ?>
                 <?php foreach ($books as $book): 
@@ -449,16 +378,17 @@ if (isset($_SESSION['user_id'])) {
                             <?php endif; ?>
 
                             <img src="<?= htmlspecialchars($book['image_path']) ?>" class="card-img-top custom-card-img" alt="<?= htmlspecialchars($book['book_name']) ?>">
+                            
                             <div class="card-body text-center d-flex flex-column justify-content-between">
                                 <div>
-                                    <h5 class="card-title fs-6 fw-bold mb-1 book-name"><?= htmlspecialchars($book['book_name']) ?></h5>
+                                    <h5 class="card-title fs-6 fw-bold mb-1 book-name text-truncate-2"><?= htmlspecialchars($book['book_name']) ?></h5>
                                     <p class="text-muted small mb-2 book-author"><?= htmlspecialchars($book['author']) ?></p>
                                     <input type="hidden" class="book-id" value="<?= $book['book_id'] ?>">
                                 </div>
                                 <div>
                                     <p class="card-text text-danger fw-bold mb-3">
                                         <?php if ($isPromo): ?>
-                                            <span class="old-price"><?= number_format($goc, 0, ',', '.') ?>đ</span>
+                                            <span class="old-price text-decoration-line-through text-muted fs-6 me-1 fw-normal"><?= number_format($goc, 0, ',', '.') ?>đ</span>
                                         <?php endif; ?>
                                         <?= number_format($gia_ban, 0, ',', '.') ?>đ
                                     </p>
@@ -499,7 +429,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- MODAL CHI TIẾT SẢN PHẨM -->
     <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
@@ -534,7 +463,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
             <p class="mb-0">&copy; World of Books.</p>
@@ -593,52 +521,55 @@ if (isset($_SESSION['user_id'])) {
             });
         }
 
-        // 2. Logic JS xử lý Filter theo Category_slug
-        const filterButtons = document.querySelectorAll('.btn-filter, .category-btn');
+        // 2. Logic JS: Đồng bộ hiệu ứng ACTIVE cho CSS thuốc nhộng
+        const filterButtons = document.querySelectorAll('.btn-filter');
+        const sidebarButtons = document.querySelectorAll('.category-btn');
         const bookItems = document.querySelectorAll('.book-item');
         const sectionTitle = document.getElementById('sectionTitle');
 
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                if(this.tagName === 'A') e.preventDefault();
+        function handleFiltering(filterValue, currentText) {
+            // Cập nhật tiêu đề h3 động dựa trên giá trị lựa chọn
+            if(filterValue === 'all') {
+                sectionTitle.textContent = "Sách nổi bật";
+            } else {
+                sectionTitle.textContent = "Thể loại: " + currentText;
+            }
 
-                const filterValue = this.getAttribute('data-target') || this.getAttribute('data-filter');
-
-                if(filterValue === 'all') {
-                    sectionTitle.textContent = "Sách nổi bật";
+            // Đồng bộ trạng thái active cho nhóm nút bấm ở thanh trung tâm
+            filterButtons.forEach(b => {
+                const target = b.getAttribute('data-target');
+                if (target === filterValue) {
+                    b.classList.add('active');
                 } else {
-                    sectionTitle.textContent = "Thể loại: " + this.textContent.trim();
+                    b.classList.remove('active');
                 }
+            });
 
-                document.querySelectorAll('.btn-filter').forEach(b => {
-                    b.classList.remove('active', 'btn-dark', 'btn-secondary');
-                    const target = b.getAttribute('data-target');
-                    if (target === 'all') {
-                        b.classList.add('btn-outline-dark');
-                    } else {
-                        b.classList.add('btn-outline-secondary');
-                    }
-                });
+            // Lọc ẩn/hiện danh sách Grid các đầu sách
+            bookItems.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                if (filterValue === 'all' || itemCategory === filterValue) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
-                const matchedCenterBtns = document.querySelectorAll(`.btn-filter[data-target="${filterValue}"]`);
-                matchedCenterBtns.forEach(matchedBtn => {
-                    matchedBtn.classList.remove('btn-outline-dark', 'btn-outline-secondary');
-                    matchedBtn.classList.add('active');
-                    if (filterValue === 'all') {
-                        matchedBtn.classList.add('btn-dark');
-                    } else {
-                        matchedBtn.classList.add('btn-secondary');
-                    }
-                });
+        // Bắt sự kiện khi click các nút hình viên thuốc ở giữa trang
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const filterValue = this.getAttribute('data-target');
+                handleFiltering(filterValue, this.textContent.trim());
+            });
+        });
 
-                bookItems.forEach(item => {
-                    const itemCategory = item.getAttribute('data-category');
-                    if (filterValue === 'all' || itemCategory === filterValue) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+        // Bắt sự kiện khi chọn danh mục từ Menu ba gạch (Sidebar)
+        sidebarButtons.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const filterValue = this.getAttribute('data-filter');
+                handleFiltering(filterValue, this.textContent.trim());
             });
         });
     });

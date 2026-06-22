@@ -65,20 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Đăng Nhập - World of Books</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #1f1c2c, #928dab);
-            height: 100vh;
-        }
-        .login-card {
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="d-flex align-items-center justify-content-center">
 
-    <div class="container" style="max-width: 450px;">
+    <div class="container login-container">
         <div class="card login-card border-0 bg-white p-4">
             <div class="text-center mb-4">
                 <a href="index.php" class="text-decoration-none text-dark">
@@ -113,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3" style="border-radius: 8px;">Đăng Nhập</button>
+                <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3 btn-custom">Đăng Nhập</button>
                 
                 <p class="text-center small text-muted mb-0">
                     Chưa có tài khoản? <a href="register.php" class="fw-bold text-decoration-none text-primary">Đăng ký ngay</a>

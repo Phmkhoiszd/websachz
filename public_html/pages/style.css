@@ -1,9 +1,62 @@
-/* --- GIAO DIỆN BỘ LỌC VIÊN THUỐC (MẪU IMAGE_D510C5.JPG) --- */
+/* ==========================================================================
+   1. STYLE DÙNG CHUNG HỆ THỐNG (GLOBAL & LAYOUT)
+   ========================================================================== */
+/* Nền gradient cho các trang Đăng nhập / Đăng ký */
+.auth-body {
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    height: 100vh;
+}
+
+/* Các khung Container biểu mẫu */
+.register-container, 
+.login-container {
+    max-width: 450px;
+}
+
+/* Các thẻ Card biểu mẫu Bo tròn & Đổ bóng */
+.register-card, 
+.login-card {
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Các nút bấm tùy chỉnh */
+.btn-register,
+.btn-custom {
+    border-radius: 8px;
+}
+
+/* Định hình độ cao ảnh bìa sách tránh méo mớ */
+.custom-card-img {
+    height: 280px;
+    object-fit: cover;
+    border-radius: 4px 4px 0 0;
+}
+
+/* Hiệu ứng chuyển động ẩn hiện cho các item sách */
+.book-item {
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* Định dạng chữ in hoa tiêu đề nhóm bộ lọc */
+.filter-group-title {
+    font-size: 0.85rem;
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+    color: #6c757d;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+
+/* ==========================================================================
+   2. GIAO DIỆN BỘ LỌC VIÊN THUỐC (PILL FILTERS)
+   ========================================================================== */
 .btn-filter {
     background-color: #f1f1f1;
     color: #555;
     border: none;
-    border-radius: 20px; /* Bo tròn hoàn toàn góc */
+    border-radius: 20px; /* Bo tròn hoàn toàn góc dạng viên thuốc */
     padding: 6px 22px;
     font-size: 14px;
     font-weight: 500;
@@ -22,22 +75,13 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Hiệu ứng chuyển động ẩn hiện cho các item sách */
-.book-item {
-    transition: transform 0.25s ease, opacity 0.25s ease;
-}
 
-/* Định hình độ cao ảnh bìa sách tránh méo mó */
-.custom-card-img {
-    height: 280px;
-    object-fit: cover;
-    border-radius: 4px 4px 0 0;
-}
-
-
-/* --- TÍNH NĂNG HOVER GIỎ HÀNG (MẪU IMAGE_D57DBF.PNG) --- */
+/* ==========================================================================
+   3. TÍNH NĂNG HOVER GIỎ HÀNG (CART DROPDOWN)
+   ========================================================================== */
 .cart-wrapper {
     display: inline-block;
+    position: relative; /* Đảm bảo dropdown định vị chuẩn theo giỏ hàng */
 }
 
 /* Khung Dropdown giỏ hàng mặc định ẩn */
@@ -77,8 +121,199 @@
     pointer-events: auto;
 }
 
-/* --- BANNER KHÔNG BỊ PHÌNH ĐỘ CAO --- */
+
+/* ==========================================================================
+   4. BANNER & NHÃN KHUYẾN MÃI (PROMO BADGES)
+   ========================================================================== */
 .custom-banner-img {
     height: 300px;
     object-fit: cover;
+}
+
+.badge-promo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 2;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-right: 5px;
+}
+
+
+/* ==========================================================================
+   5. KHỐI FLASH SALE PHONG CÁCH SHOPEE
+   ========================================================================== */
+/* Khối Flash Sale Tổng */
+.flash-sale-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.flash-sale-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.flash-sale-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff4742;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Đồng hồ đếm ngược */
+.countdown-box {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 10px;
+}
+
+.countdown-time {
+    background-color: #000;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Thanh cuộn ngang cho sản phẩm sale */
+.flash-sale-slider {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 10px;
+}
+
+.flash-sale-slider::-webkit-scrollbar {
+    height: 6px;
+}
+
+.flash-sale-slider::-webkit-scrollbar-thumb {
+    background-color: #e0e0e0;
+    border-radius: 4px;
+}
+
+/* Card sản phẩm Flash Sale */
+.flash-sale-item {
+    flex: 0 0 calc(16.666% - 13px);
+    min-width: 160px;
+    position: relative;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Nhãn giảm giá phần trăm chéo đuôi cá góc phải giống Shopee */
+.shopee-badge-promo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(255, 212, 36, 0.9);
+    color: #ec3818;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom-left-radius: 4px;
+    z-index: 3;
+}
+
+.shopee-badge-promo::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 4px solid rgba(255, 212, 36, 0.9);
+}
+
+/* Giá và thanh tiến trình SELLING FAST */
+.flash-sale-price {
+    color: #ee4d2d;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.selling-fast-bar {
+    position: relative;
+    background-color: #ffbda6;
+    color: #fff;
+    border-radius: 10px;
+    height: 16px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.selling-fast-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #ff5722, #ff7337);
+    z-index: -1;
+    border-radius: 10px;
+}
+
+
+/* ==========================================================================
+   6. STYLE BỔ SUNG RIÊNG CHO TRANG LIÊN HỆ (CONTACT)
+   ========================================================================== */
+.contact-body {
+    background-color: #f8f9fa !important;
+}
+
+.contact-container {
+    max-width: 600px;
+}
+
+.contact-card {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+@keyframes flash-animation {
+    0% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0.3; transform: scale(0.9); }
+}
+.animation-flash {
+    animation: flash-animation 1.2s infinite ease-in-out;
+}
+/* Hiệu ứng rê chuột vào thẻ sách flash sale */
+.card.flex-shrink-0:hover {
+    transform: translateY(-4px);
+    border-color: #dc3545 !important;
 }
