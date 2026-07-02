@@ -6,29 +6,30 @@ require_once 'db.php';
 $stats = [];
 
 // Tổng số đơn hàng
-$stmt = $pdo->query("SELECT COUNT(*) as total FROM orders");
+$stmt = $pdo->query("select count(*) as total from orders");
 $stats['total_orders'] = $stmt->fetch()['total'];
 
 // Tổng doanh thu
-$stmt = $pdo->query("SELECT SUM(total_amount) as revenue FROM orders WHERE status != 'Cancelled'");
+$stmt = $pdo->query("select sum(total_amount) as revenue from orders where status != 'cancelled'");
 $result = $stmt->fetch();
 $stats['revenue'] = $result['revenue'] ?? 0;
 
 // Số đơn chưa xử lý
-$stmt = $pdo->query("SELECT COUNT(*) as pending FROM orders WHERE status = 'Pending'");
+$stmt = $pdo->query("select count(*) as pending from orders where status = 'pending'");
 $stats['pending'] = $stmt->fetch()['pending'];
 
 // Số sách trong kho
-$stmt = $pdo->query("SELECT COUNT(*) as total FROM books");
+$stmt = $pdo->query("select count(*) as total from books");
 $stats['total_books'] = $stmt->fetch()['total'];
 
 // Đơn hàng gần đây
-$stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC LIMIT 5");
+$stmt = $pdo->query("select * from orders order by created_at desc limit 5");
 $recent_orders = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,23 +37,107 @@ $recent_orders = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; padding: 20px 0; }
-        .sidebar .logo { text-align: center; color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); margin: 10px 0; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
-        .main-content { margin-left: 250px; padding: 30px; background: #f8f9fa; min-height: 100vh; }
-        .stat-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .stat-icon { font-size: 32px; margin-bottom: 10px; }
-        .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
-        .stat-label { color: #999; font-size: 14px; margin-top: 5px; }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-info img { width: 40px; height: 40px; border-radius: 50%; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 20px 0;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -86,7 +171,8 @@ $recent_orders = $stmt->fetchAll();
             </div>
             <div class="user-info">
                 <span><?= date('d/m/Y H:i') ?></span>
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
                     <?= strtoupper(substr($_SESSION['username'], 0, 1)) ?>
                 </div>
             </div>
@@ -151,16 +237,21 @@ $recent_orders = $stmt->fetchAll();
                                             <td><?= number_format($order['total_amount'], 0, ',', '.') ?> đ</td>
                                             <td>
                                                 <?php
-                                                    $badge_class = 'bg-secondary';
-                                                    if ($order['status'] == 'Pending') $badge_class = 'bg-warning text-dark';
-                                                    elseif ($order['status'] == 'Processing') $badge_class = 'bg-info text-white';
-                                                    elseif ($order['status'] == 'Completed') $badge_class = 'bg-success';
-                                                    elseif ($order['status'] == 'Cancelled') $badge_class = 'bg-danger';
+                                                $badge_class = 'bg-secondary';
+                                                if ($order['status'] == 'pending')
+                                                    $badge_class = 'bg-warning text-dark';
+                                                elseif ($order['status'] == 'processing')
+                                                    $badge_class = 'bg-info text-white';
+                                                elseif ($order['status'] == 'completed')
+                                                    $badge_class = 'bg-success';
+                                                elseif ($order['status'] == 'cancelled')
+                                                    $badge_class = 'bg-danger';
                                                 ?>
                                                 <span class="badge <?= $badge_class ?>"><?= $order['status'] ?></span>
                                             </td>
                                             <td>
-                                                <a href="admin_order_detail.php?id=<?= $order['order_id'] ?>" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                                                <a href="admin_order_detail.php?id=<?= $order['order_id'] ?>"
+                                                    class="btn btn-sm btn-outline-primary">Chi tiết</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -191,4 +282,5 @@ $recent_orders = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -10,7 +10,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $order_id = $_GET['id'];
 
 // Lấy thông tin đơn hàng tổng quát
-$stmt = $pdo->prepare("SELECT * FROM orders WHERE order_id = ?");
+$stmt = $pdo->prepare("select * from orders where order_id = ?");
 $stmt->execute([$order_id]);
 $order = $stmt->fetch();
 
@@ -20,10 +20,10 @@ if (!$order) {
 
 // Lấy danh sách sản phẩm thuộc đơn hàng (JOIN với bảng books để lấy tên sách, hình ảnh)
 $stmt = $pdo->prepare("
-    SELECT oi.*, b.book_name, b.image_path 
-    FROM order_items oi 
-    JOIN books b ON oi.book_id = b.book_id 
-    WHERE oi.order_id = ?
+    select oi.*, b.book_name, b.image_path 
+    from order_items oi 
+    join books b on oi.book_id = b.book_id 
+    where oi.order_id = ?
 ");
 $stmt->execute([$order_id]);
 $items = $stmt->fetchAll();
@@ -31,6 +31,7 @@ $items = $stmt->fetchAll();
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,16 +39,62 @@ $items = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; padding: 20px 0; }
-        .sidebar .logo { text-align: center; color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); margin: 10px 0; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
-        .main-content { margin-left: 250px; padding: 30px; background: #f8f9fa; min-height: 100vh; }
-        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 20px 0;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -89,16 +136,22 @@ $items = $stmt->fetchAll();
                         <p><strong>Điện thoại:</strong><br><?= htmlspecialchars($order['phone']) ?></p>
                         <p><strong>Email:</strong><br><?= htmlspecialchars($order['email']) ?></p>
                         <p><strong>Địa chỉ giao hàng:</strong><br><?= htmlspecialchars($order['address']) ?></p>
-                        <p><strong>Ngày đặt hàng:</strong><br><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></p>
+                        <p><strong>Ngày đặt hàng:</strong><br><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?>
+                        </p>
                         <p><strong>Trạng thái:</strong><br>
-                            <?php 
-                                $badge_class = 'bg-secondary';
-                                if ($order['status'] == 'Pending') $badge_class = 'bg-warning text-dark';
-                                elseif ($order['status'] == 'Processing') $badge_class = 'bg-info text-white';
-                                elseif ($order['status'] == 'Completed') $badge_class = 'bg-success';
-                                elseif ($order['status'] == 'Cancelled') $badge_class = 'bg-danger';
+                            <?php
+                            $badge_class = 'bg-secondary';
+                            if ($order['status'] == 'pending')
+                                $badge_class = 'bg-warning text-dark';
+                            elseif ($order['status'] == 'processing')
+                                $badge_class = 'bg-info text-white';
+                            elseif ($order['status'] == 'completed')
+                                $badge_class = 'bg-success';
+                            elseif ($order['status'] == 'cancelled')
+                                $badge_class = 'bg-danger';
                             ?>
-                            <span class="badge <?= $badge_class ?>" style="font-size: 0.9rem; padding: 0.5rem;"><?= $order['status'] ?></span>
+                            <span class="badge <?= $badge_class ?>"
+                                style="font-size: 0.9rem; padding: 0.5rem;"><?= $order['status'] ?></span>
                         </p>
                     </div>
                 </div>
@@ -123,17 +176,23 @@ $items = $stmt->fetchAll();
                                     <?php foreach ($items as $item): ?>
                                         <tr>
                                             <td>
-                                                <img src="../<?= htmlspecialchars($item['image_path']) ?>" alt="" style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                                <img src="../<?= htmlspecialchars($item['image_path']) ?>" alt=""
+                                                    style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
                                             </td>
                                             <td><?= htmlspecialchars($item['book_name']) ?></td>
                                             <td class="text-end"><?= number_format($item['price'], 0, ',', '.') ?> đ</td>
-                                            <td class="text-center"><span class="badge bg-light text-dark"><?= $item['quantity'] ?></span></td>
-                                            <td class="text-end fw-bold"><?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ</td>
+                                            <td class="text-center"><span
+                                                    class="badge bg-light text-dark"><?= $item['quantity'] ?></span></td>
+                                            <td class="text-end fw-bold">
+                                                <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                     <tr class="table-light fw-bold">
                                         <td colspan="4" class="text-end">TỔNG GIÁ TRỊ ĐƠN HÀNG:</td>
-                                        <td class="text-end text-danger" style="font-size: 1.1rem;"><?= number_format($order['total_amount'], 0, ',', '.') ?> đ</td>
+                                        <td class="text-end text-danger" style="font-size: 1.1rem;">
+                                            <?= number_format($order['total_amount'], 0, ',', '.') ?> đ
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -146,4 +205,5 @@ $items = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

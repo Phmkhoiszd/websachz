@@ -11,7 +11,7 @@ $book_id = intval($_GET['id']);
 $message = '';
 
 // Lấy thông tin sách
-$stmt = $pdo->prepare("SELECT * FROM books WHERE book_id = ?");
+$stmt = $pdo->prepare("select * from books where book_id = ?");
 $stmt->execute([$book_id]);
 $book = $stmt->fetch();
 
@@ -29,11 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_book'])) {
     $image_path = trim($_POST['image_path']);
 
     if ($book_name && $author && $price > 0) {
-        $stmt = $pdo->prepare("UPDATE books SET book_name = ?, author = ?, price = ?, category_id = ?, image_path = ? WHERE book_id = ?");
+        $stmt = $pdo->prepare("update books set book_name = ?, author = ?, price = ?, category_id = ?, image_path = ? where book_id = ?");
         if ($stmt->execute([$book_name, $author, $price, $category_id, $image_path, $book_id])) {
             $message = '<div class="alert alert-success">Cập nhật sách thành công!</div>';
             // Reload book data
-            $stmt = $pdo->prepare("SELECT * FROM books WHERE book_id = ?");
+            $stmt = $pdo->prepare("select * from books where book_id = ?");
             $stmt->execute([$book_id]);
             $book = $stmt->fetch();
         }
@@ -41,12 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_book'])) {
 }
 
 // Lấy danh mục
-$stmt = $pdo->query("SELECT * FROM categories");
+$stmt = $pdo->query("select * from categories");
 $categories = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,16 +55,62 @@ $categories = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; padding: 20px 0; }
-        .sidebar .logo { text-align: center; color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); margin: 10px 0; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
-        .main-content { margin-left: 250px; padding: 30px; background: #f8f9fa; min-height: 100vh; }
-        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 20px 0;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -91,7 +138,7 @@ $categories = $stmt->fetchAll();
     <!-- Main Content -->
     <div class="main-content">
         <a href="admin_books.php" class="btn btn-secondary mb-4">⬅️ Quay lại</a>
-        
+
         <h1 class="mb-4">Sửa Sách</h1>
 
         <?= $message ?>
@@ -104,15 +151,18 @@ $categories = $stmt->fetchAll();
                 <form method="POST" class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Tên sách</label>
-                        <input type="text" name="book_name" class="form-control" value="<?= htmlspecialchars($book['book_name']) ?>" required>
+                        <input type="text" name="book_name" class="form-control"
+                            value="<?= htmlspecialchars($book['book_name']) ?>" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Tác giả</label>
-                        <input type="text" name="author" class="form-control" value="<?= htmlspecialchars($book['author']) ?>" required>
+                        <input type="text" name="author" class="form-control"
+                            value="<?= htmlspecialchars($book['author']) ?>" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giá</label>
-                        <input type="number" name="price" class="form-control" step="0.01" value="<?= $book['price'] ?>" required>
+                        <input type="number" name="price" class="form-control" step="0.01" value="<?= $book['price'] ?>"
+                            required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Danh mục</label>
@@ -127,10 +177,12 @@ $categories = $stmt->fetchAll();
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Đường dẫn hình ảnh</label>
-                        <input type="text" name="image_path" class="form-control" value="<?= htmlspecialchars($book['image_path']) ?>" required>
+                        <input type="text" name="image_path" class="form-control"
+                            value="<?= htmlspecialchars($book['image_path']) ?>" required>
                     </div>
                     <div class="col-12">
-                        <button type="submit" name="update_book" class="btn btn-primary"><i class="bi bi-save"></i> Cập nhật</button>
+                        <button type="submit" name="update_book" class="btn btn-primary"><i class="bi bi-save"></i> Cập
+                            nhật</button>
                     </div>
                 </form>
             </div>
@@ -139,4 +191,5 @@ $categories = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

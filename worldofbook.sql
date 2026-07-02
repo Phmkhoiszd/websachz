@@ -24,27 +24,27 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `books`
+-- Table structure for table `Books`
 --
 
-CREATE TABLE `books` (
-  `book_id` int(11) NOT NULL,
-  `book_name` varchar(255) NOT NULL,
-  `author` varchar(150) NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `image_path` varchar(255) NOT NULL,
-  `category_id` int(11) DEFAULT NULL,
-  `is_best_seller` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `sales_count` int(11) DEFAULT 0,
-  `discount_percent` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `books` (
+  `book_id` int(11) not null,
+  `book_name` varchar(255) not null,
+  `author` varchar(150) not null,
+  `price` decimal(10,2) not null,
+  `image_path` varchar(255) not null,
+  `category_id` int(11) default null,
+  `is_best_seller` tinyint(1) default 0,
+  `created_at` timestamp not null default current_timestamp(),
+  `sales_count` int(11) default 0,
+  `discount_percent` int(11) default 0
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
--- Dumping data for table `books`
+-- Dumping data for table `Books`
 --
 
-INSERT INTO `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `category_id`, `is_best_seller`, `created_at`, `sales_count`, `discount_percent`) VALUES
+insert into `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `category_id`, `is_best_seller`, `created_at`, `sales_count`, `discount_percent`) values
 (1, 'Đắc Nhân Tâm', 'Dale Carnegie', 86000.00, 'images/dacnhantam.jpg', 5, 0, '2026-06-18 15:58:44', 0, 20),
 (2, 'Nhà Giả Kim', 'Paulo Coelho', 79000.00, 'images/nhagiakim.jpg', 2, 0, '2026-06-18 15:58:44', 0, 15),
 (3, 'Tuổi Trẻ Đáng Giá Bao Nhiêu', 'Rosie Nguyễn', 75000.00, 'images/tuoitredanggiabaonhieu.jpg', 5, 0, '2026-06-18 15:58:44', 150, 0),
@@ -90,19 +90,19 @@ INSERT INTO `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `c
 -- Table structure for table `carts`
 --
 
-CREATE TABLE `carts` (
-  `cart_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `book_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL DEFAULT 1,
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `carts` (
+  `cart_id` int(11) not null,
+  `user_id` int(11) not null,
+  `book_id` int(11) not null,
+  `quantity` int(11) not null default 1,
+  `added_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `carts`
 --
 
-INSERT INTO `carts` (`cart_id`, `user_id`, `book_id`, `quantity`, `added_at`) VALUES
+insert into `carts` (`cart_id`, `user_id`, `book_id`, `quantity`, `added_at`) values
 (10, 1, 2, 2, '2026-06-21 15:45:59'),
 (11, 1, 3, 1, '2026-06-22 16:09:51'),
 (12, 1, 10, 1, '2026-06-22 16:24:00'),
@@ -111,20 +111,20 @@ INSERT INTO `carts` (`cart_id`, `user_id`, `book_id`, `quantity`, `added_at`) VA
 -- --------------------------------------------------------
 
 --
--- Table structure for table `categories`
+-- Table structure for table `Categories`
 --
 
-CREATE TABLE `categories` (
-  `category_id` int(11) NOT NULL,
-  `category_slug` varchar(50) NOT NULL,
-  `category_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `categories` (
+  `category_id` int(11) not null,
+  `category_slug` varchar(100) not null unique,
+  `category_name` varchar(150) not null
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
--- Dumping data for table `categories`
+-- Dumping data for table `Categories`
 --
 
-INSERT INTO `categories` (`category_id`, `category_slug`, `category_name`) VALUES
+insert into `categories` (`category_id`, `category_slug`, `category_name`) values
 (1, 'tre-em', 'Trẻ em'),
 (2, 'van-hoc', 'Văn học & Tiểu thuyết'),
 (3, 'kinh-te', 'Kinh tế - Kinh doanh'),
@@ -138,23 +138,23 @@ INSERT INTO `categories` (`category_id`, `category_slug`, `category_name`) VALUE
 -- Table structure for table `orders`
 --
 
-CREATE TABLE `orders` (
-  `order_id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `full_name` varchar(150) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `address` text NOT NULL,
-  `total_amount` decimal(10,2) NOT NULL,
-  `status` varchar(50) DEFAULT 'Pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `orders` (
+  `order_id` int(11) not null,
+  `user_id` int(11) default null,
+  `full_name` varchar(255) not null,
+  `email` varchar(150) not null,
+  `phone` varchar(20) not null,
+  `address` text not null,
+  `total_amount` decimal(15,2) not null,
+  `status` varchar(50) not null default 'pending',
+  `created_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `full_name`, `email`, `phone`, `address`, `total_amount`, `status`, `created_at`) VALUES
+insert into `orders` (`order_id`, `user_id`, `full_name`, `email`, `phone`, `address`, `total_amount`, `status`, `created_at`) values
 (1, 1, 'kkkkk', 'khppp@gmail.com', '342345233', '23422', 310000.00, 'Pending', '2026-06-21 04:37:45'),
 (2, 1, 'kkkkk', 'kkkkk2@Q', '2131', '23435fgre', 703000.00, 'Pending', '2026-06-21 15:36:12');
 
@@ -164,19 +164,19 @@ INSERT INTO `orders` (`order_id`, `user_id`, `full_name`, `email`, `phone`, `add
 -- Table structure for table `order_items`
 --
 
-CREATE TABLE `order_items` (
-  `item_id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `book_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `price` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `order_items` (
+  `item_id` int(11) not null,
+  `order_id` int(11) not null,
+  `book_id` int(11) not null,
+  `quantity` int(11) not null,
+  `price` decimal(10,2) not null
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `order_items`
 --
 
-INSERT INTO `order_items` (`item_id`, `order_id`, `book_id`, `quantity`, `price`) VALUES
+insert into `order_items` (`item_id`, `order_id`, `book_id`, `quantity`, `price`) values
 (1, 1, 2, 1, 79000.00),
 (2, 1, 4, 1, 50000.00),
 (3, 1, 1, 1, 86000.00),
@@ -193,21 +193,21 @@ INSERT INTO `order_items` (`item_id`, `order_id`, `book_id`, `quantity`, `price`
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
-  `username` varchar(100) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `role` varchar(20) NOT NULL DEFAULT 'user',
-  `full_name` varchar(150) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `users` (
+  `user_id` int(11) not null,
+  `username` varchar(100) not null,
+  `email` varchar(150) not null,
+  `password_hash` varchar(255) not null,
+  `role` varchar(20) not null default 'user',
+  `full_name` varchar(150) default null,
+  `created_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `full_name`, `created_at`) VALUES
+insert into `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `full_name`, `created_at`) values
 (1, 'kkkkk', 'khoip8500@gmail.com', '$2y$10$2xuhz4AYMFwUykm17keGgO4w3jUHMBIJSnOTq7F9c4UZZp7K68WkG', 'user', 'kkkkk', '2026-06-18 16:32:08'),
 (2, 'dinh1111', 'dinh1976@gmail.com', '$2y$10$S9G/N0U7rA.W76L.bH8eI.mBw688/A6zH6EBlwUvVdO2eN7hREdO.', 'admin', NULL, '2026-06-21 04:24:57');
 
@@ -216,119 +216,119 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `f
 --
 
 --
--- Indexes for table `books`
+-- Indexes for table `Books`
 --
-ALTER TABLE `books`
-  ADD PRIMARY KEY (`book_id`),
-  ADD KEY `category_id` (`category_id`);
+alter table `books`
+  add primary key (`book_id`),
+  add key `category_id` (`category_id`);
 
 --
 -- Indexes for table `carts`
 --
-ALTER TABLE `carts`
-  ADD PRIMARY KEY (`cart_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `book_id` (`book_id`);
+alter table `carts`
+  add primary key (`cart_id`),
+  add key `user_id` (`user_id`),
+  add key `book_id` (`book_id`);
 
 --
--- Indexes for table `categories`
+-- Indexes for table `Categories`
 --
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`category_id`),
-  ADD UNIQUE KEY `category_slug` (`category_slug`);
+alter table `categories`
+  add primary key (`category_id`),
+  add unique key `category_slug` (`category_slug`);
 
 --
 -- Indexes for table `orders`
 --
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`order_id`),
-  ADD KEY `user_id` (`user_id`);
+alter table `orders`
+  add primary key (`order_id`),
+  add key `user_id` (`user_id`);
 
 --
 -- Indexes for table `order_items`
 --
-ALTER TABLE `order_items`
-  ADD PRIMARY KEY (`item_id`),
-  ADD KEY `order_id` (`order_id`),
-  ADD KEY `book_id` (`book_id`);
+alter table `order_items`
+  add primary key (`item_id`),
+  add key `order_id` (`order_id`),
+  add key `book_id` (`book_id`);
 
 --
 -- Indexes for table `users`
 --
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
+alter table `users`
+  add primary key (`user_id`),
+  add unique key `username` (`username`),
+  add unique key `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `books`
+-- AUTO_INCREMENT for table `Books`
 --
-ALTER TABLE `books`
-  MODIFY `book_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+alter table `books`
+  modify `book_id` int(11) not null auto_increment, auto_increment=39;
 
 --
 -- AUTO_INCREMENT for table `carts`
 --
-ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+alter table `carts`
+  modify `cart_id` int(11) not null auto_increment, auto_increment=14;
 
 --
--- AUTO_INCREMENT for table `categories`
+-- AUTO_INCREMENT for table `Categories`
 --
-ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+alter table `categories`
+  modify `category_id` int(11) not null auto_increment, auto_increment=7;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
-ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+alter table `orders`
+  modify `order_id` int(11) not null auto_increment, auto_increment=3;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
-ALTER TABLE `order_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+alter table `order_items`
+  modify `item_id` int(11) not null auto_increment, auto_increment=2;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
-ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+alter table `users`
+  modify `user_id` int(11) not null auto_increment, auto_increment=3;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `books`
+-- Constraints for table `Books`
 --
-ALTER TABLE `books`
-  ADD CONSTRAINT `books_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE SET NULL;
+alter table `books`
+  add constraint `books_ibfk_1` foreign key (`category_id`) references `categories` (`category_id`) on delete set null;
 
 --
 -- Constraints for table `carts`
 --
-ALTER TABLE `carts`
-  ADD CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`) ON DELETE CASCADE;
+alter table `carts`
+  add constraint `carts_ibfk_1` foreign key (`user_id`) references `users` (`user_id`) on delete cascade,
+  add constraint `carts_ibfk_2` foreign key (`book_id`) references `books` (`book_id`) on delete cascade;
 
 --
 -- Constraints for table `orders`
 --
-ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
+alter table `orders`
+  add constraint `orders_ibfk_1` foreign key (`user_id`) references `users` (`user_id`) on delete set null;
 
 --
 -- Constraints for table `order_items`
 --
-ALTER TABLE `order_items`
-  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`) ON DELETE CASCADE;
+alter table `order_items`
+  add constraint `order_items_ibfk_1` foreign key (`order_id`) references `orders` (`order_id`) on delete cascade,
+  add constraint `order_items_ibfk_2` foreign key (`book_id`) references `books` (`book_id`) on delete cascade;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -10,21 +10,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_cart'])) {
         $cart_id = intval($_POST['cart_id']);
         $quantity = max(1, intval($_POST['quantity']));
-        $stmt = $pdo->prepare("UPDATE carts SET quantity = ? WHERE cart_id = ? AND user_id = ?");
+        $stmt = $pdo->prepare("update carts set quantity = ? where cart_id = ? and user_id = ?");
         $stmt->execute([$quantity, $cart_id, $user_id]);
         $message = '<div class="alert alert-success">Cập nhật giỏ hàng thành công!</div>';
     }
 
     if (isset($_POST['remove_cart'])) {
         $cart_id = intval($_POST['cart_id']);
-        $stmt = $pdo->prepare("DELETE FROM carts WHERE cart_id = ? AND user_id = ?");
+        $stmt = $pdo->prepare("delete from carts where cart_id = ? and user_id = ?");
         $stmt->execute([$cart_id, $user_id]);
         $message = '<div class="alert alert-success">Đã xóa sản phẩm khỏi giỏ hàng.</div>';
     }
 }
 
 // Lấy danh sách sản phẩm trong giỏ hàng của user
-$stmt = $pdo->prepare("SELECT c.cart_id, c.quantity, b.book_id, b.book_name, b.price, b.image_path FROM carts c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = ?");
+$stmt = $pdo->prepare("select c.cart_id, c.quantity, b.book_id, b.book_name, b.price, b.image_path from carts c join books b on c.book_id = b.book_id where c.user_id = ?");
 $stmt->execute([$user_id]);
 $cartItems = $stmt->fetchAll();
 
@@ -35,6 +35,7 @@ foreach ($cartItems as $item) {
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,12 +43,29 @@ foreach ($cartItems as $item) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
-        .cart-card { border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .cart-item-img { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; }
-        .table thead th { border-bottom: 2px solid #dee2e6; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .cart-card {
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .cart-item-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+        }
     </style>
 </head>
+
 <body>
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -75,7 +93,8 @@ foreach ($cartItems as $item) {
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
-                                            <img src="../<?= htmlspecialchars($item['image_path']) ?>" alt="" class="cart-item-img">
+                                            <img src="../<?= htmlspecialchars($item['image_path']) ?>" alt=""
+                                                class="cart-item-img">
                                             <div>
                                                 <h6 class="mb-1"><?= htmlspecialchars($item['book_name']) ?></h6>
                                                 <small class="text-muted">ID sách: <?= $item['book_id'] ?></small>
@@ -85,16 +104,20 @@ foreach ($cartItems as $item) {
                                     <td class="text-center">
                                         <form method="POST" class="d-flex justify-content-center align-items-center gap-2">
                                             <input type="hidden" name="cart_id" value="<?= $item['cart_id'] ?>">
-                                            <input type="number" name="quantity" value="<?= $item['quantity'] ?>" min="1" class="form-control form-control-sm" style="width: 80px;">
-                                            <button type="submit" name="update_cart" class="btn btn-sm btn-primary">Cập nhật</button>
+                                            <input type="number" name="quantity" value="<?= $item['quantity'] ?>" min="1"
+                                                class="form-control form-control-sm" style="width: 80px;">
+                                            <button type="submit" name="update_cart" class="btn btn-sm btn-primary">Cập
+                                                nhật</button>
                                         </form>
                                     </td>
                                     <td class="text-end"><?= number_format($item['price'], 0, ',', '.') ?> đ</td>
-                                    <td class="text-end"><?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ</td>
+                                    <td class="text-end"><?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ
+                                    </td>
                                     <td class="text-end">
                                         <form method="POST">
                                             <input type="hidden" name="cart_id" value="<?= $item['cart_id'] ?>">
-                                            <button type="submit" name="remove_cart" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                            <button type="submit" name="remove_cart"
+                                                class="btn btn-sm btn-outline-danger">Xóa</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -115,7 +138,8 @@ foreach ($cartItems as $item) {
                 </div>
             <?php else: ?>
                 <div class="text-center py-5">
-                    <img src="../images/emptycart.jpg" alt="Giỏ hàng trống" class="img-fluid mb-3" style="width: 140px; opacity: 0.6;">
+                    <img src="../images/emptycart.jpg" alt="Giỏ hàng trống" class="img-fluid mb-3"
+                        style="width: 140px; opacity: 0.6;">
                     <h5>Giỏ hàng của bạn đang trống</h5>
                     <p class="text-muted">Thêm sách vào giỏ để tiếp tục mua sắm.</p>
                     <a href="../index.php" class="btn btn-primary">Mua sắm ngay</a>
@@ -124,4 +148,5 @@ foreach ($cartItems as $item) {
         </div>
     </div>
 </body>
+
 </html>

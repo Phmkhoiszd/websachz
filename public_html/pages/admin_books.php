@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_book'])) {
     $image_path = trim($_POST['image_path']);
 
     if ($book_name && $author && $price > 0) {
-        $stmt = $pdo->prepare("INSERT INTO books (book_name, author, price, category_id, image_path) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("insert into books (book_name, author, price, category_id, image_path) values (?, ?, ?, ?, ?)");
         if ($stmt->execute([$book_name, $author, $price, $category_id, $image_path])) {
             $message = '<div class="alert alert-success">Thêm sách thành công!</div>';
         }
@@ -23,23 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_book'])) {
 // Xử lý xóa sách
 if (isset($_GET['delete'])) {
     $book_id = intval($_GET['delete']);
-    $stmt = $pdo->prepare("DELETE FROM books WHERE book_id = ?");
+    $stmt = $pdo->prepare("delete from books where book_id = ?");
     if ($stmt->execute([$book_id])) {
         $message = '<div class="alert alert-success">Xóa sách thành công!</div>';
     }
 }
 
 // Lấy danh sách sách
-$stmt = $pdo->query("SELECT b.*, c.category_name FROM books b LEFT JOIN categories c ON b.category_id = c.category_id ORDER BY b.book_id DESC");
+$stmt = $pdo->query("select b.*, c.category_name from books b left join categories c on b.category_id = c.category_id order by b.book_id desc");
 $books = $stmt->fetchAll();
 
 // Lấy danh mục
-$stmt = $pdo->query("SELECT * FROM categories");
+$stmt = $pdo->query("select * from categories");
 $categories = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,16 +48,62 @@ $categories = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; padding: 20px 0; }
-        .sidebar .logo { text-align: center; color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); margin: 10px 0; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
-        .main-content { margin-left: 250px; padding: 30px; background: #f8f9fa; min-height: 100vh; }
-        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 20px 0;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -117,10 +164,12 @@ $categories = $stmt->fetchAll();
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Đường dẫn hình ảnh</label>
-                        <input type="text" name="image_path" class="form-control" placeholder="images/book.jpg" required>
+                        <input type="text" name="image_path" class="form-control" placeholder="images/book.jpg"
+                            required>
                     </div>
                     <div class="col-12">
-                        <button type="submit" name="add_book" class="btn btn-primary"><i class="bi bi-plus"></i> Thêm sách</button>
+                        <button type="submit" name="add_book" class="btn btn-primary"><i class="bi bi-plus"></i> Thêm
+                            sách</button>
                     </div>
                 </form>
             </div>
@@ -150,15 +199,18 @@ $categories = $stmt->fetchAll();
                                 <tr>
                                     <td><?= $book['book_id'] ?></td>
                                     <td>
-                                        <img src="../<?= htmlspecialchars($book['image_path']) ?>" alt="" style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                        <img src="../<?= htmlspecialchars($book['image_path']) ?>" alt=""
+                                            style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
                                     </td>
                                     <td><?= htmlspecialchars($book['book_name']) ?></td>
                                     <td><?= htmlspecialchars($book['author']) ?></td>
                                     <td><?= number_format($book['price'], 0, ',', '.') ?> đ</td>
                                     <td><span class="badge bg-info"><?= $book['category_name'] ?? 'N/A' ?></span></td>
                                     <td>
-                                        <a href="admin_edit_book.php?id=<?= $book['book_id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="?delete=<?= $book['book_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
+                                        <a href="admin_edit_book.php?id=<?= $book['book_id'] ?>"
+                                            class="btn btn-sm btn-warning">Sửa</a>
+                                        <a href="?delete=<?= $book['book_id'] ?>" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -171,4 +223,5 @@ $categories = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

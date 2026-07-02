@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address']);
 
     if ($full_name && $email && $phone && $address) {
-        $stmt = $pdo->prepare("SELECT c.quantity, b.book_id, b.book_name, b.price FROM carts c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = ?");
+        $stmt = $pdo->prepare("select c.quantity, b.book_id, b.book_name, b.price from carts c join books b on c.book_id = b.book_id where c.user_id = ?");
         $stmt->execute([$user_id]);
         $cartItems = $stmt->fetchAll();
 
@@ -25,16 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->beginTransaction();
             try {
-                $stmtOrder = $pdo->prepare("INSERT INTO orders (user_id, full_name, email, phone, address, total_amount, status) VALUES (?, ?, ?, ?, ?, ?, 'Pending')");
+                $stmtOrder = $pdo->prepare("insert into orders (user_id, full_name, email, phone, address, total_amount, status) values (?, ?, ?, ?, ?, ?, 'pending')");
                 $stmtOrder->execute([$user_id, $full_name, $email, $phone, $address, $totalPrice]);
                 $order_id = $pdo->lastInsertId();
 
-                $stmtItem = $pdo->prepare("INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)");
+                $stmtItem = $pdo->prepare("insert into order_items (order_id, book_id, quantity, price) values (?, ?, ?, ?)");
                 foreach ($cartItems as $item) {
                     $stmtItem->execute([$order_id, $item['book_id'], $item['quantity'], $item['price']]);
                 }
 
-                $stmtDelete = $pdo->prepare("DELETE FROM carts WHERE user_id = ?");
+                $stmtDelete = $pdo->prepare("delete from carts where user_id = ?");
                 $stmtDelete->execute([$user_id]);
 
                 $pdo->commit();
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Lấy giỏ hàng và tổng tiền
-$stmt = $pdo->prepare("SELECT c.quantity, b.book_name, b.price FROM carts c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = ?");
+$stmt = $pdo->prepare("select c.quantity, b.book_name, b.price from carts c join books b on c.book_id = b.book_id where c.user_id = ?");
 $stmt->execute([$user_id]);
 $cartItems = $stmt->fetchAll();
 
@@ -71,6 +71,7 @@ $userInfo = [
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,6 +79,7 @@ $userInfo = [
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
+
 <body style="background: #f8f9fa;">
     <div class="container py-5">
         <div class="row">
@@ -91,21 +93,26 @@ $userInfo = [
                         <form method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Họ và tên</label>
-                                <input type="text" name="full_name" class="form-control" value="<?= htmlspecialchars($userInfo['full_name']) ?>" required>
+                                <input type="text" name="full_name" class="form-control"
+                                    value="<?= htmlspecialchars($userInfo['full_name']) ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($userInfo['email']) ?>" required>
+                                <input type="email" name="email" class="form-control"
+                                    value="<?= htmlspecialchars($userInfo['email']) ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Số điện thoại</label>
-                                <input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($userInfo['phone']) ?>" required>
+                                <input type="text" name="phone" class="form-control"
+                                    value="<?= htmlspecialchars($userInfo['phone']) ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Địa chỉ giao hàng</label>
-                                <textarea name="address" class="form-control" rows="4" required><?= htmlspecialchars($userInfo['address']) ?></textarea>
+                                <textarea name="address" class="form-control" rows="4"
+                                    required><?= htmlspecialchars($userInfo['address']) ?></textarea>
                             </div>
-                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-bag-check me-1"></i> Xác nhận thanh toán</button>
+                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-bag-check me-1"></i> Xác
+                                nhận thanh toán</button>
                         </form>
                     </div>
                 </div>
@@ -124,7 +131,9 @@ $userInfo = [
                                             <div class="fw-bold"><?= htmlspecialchars($item['book_name']) ?></div>
                                             <small class="text-muted">x<?= $item['quantity'] ?></small>
                                         </div>
-                                        <span class="text-danger fw-bold"><?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ</span>
+                                        <span
+                                            class="text-danger fw-bold"><?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?>
+                                            đ</span>
                                     </li>
                                 <?php endforeach; ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
@@ -144,4 +153,5 @@ $userInfo = [
         </div>
     </div>
 </body>
+
 </html>

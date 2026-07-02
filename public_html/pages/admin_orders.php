@@ -7,14 +7,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['status'];
     
-    $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE order_id = ?");
+    $stmt = $pdo->prepare("update orders set status = ? where order_id = ?");
     $stmt->execute([$new_status, $order_id]);
     header("Location: admin_orders.php?msg=Cập nhật thành công!");
     exit;
 }
 
 // Lấy danh sách toàn bộ đơn hàng
-$stmt = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC");
+$stmt = $pdo->query("select * from orders order by created_at desc");
 $orders = $stmt->fetchAll();
 ?>
 
@@ -107,10 +107,10 @@ $orders = $stmt->fetchAll();
                                     <td>
                                         <?php 
                                             $badge_class = 'bg-secondary';
-                                            if ($order['status'] == 'Pending') $badge_class = 'bg-warning text-dark';
-                                            elseif ($order['status'] == 'Processing') $badge_class = 'bg-info text-white';
-                                            elseif ($order['status'] == 'Completed') $badge_class = 'bg-success';
-                                            elseif ($order['status'] == 'Cancelled') $badge_class = 'bg-danger';
+                                            if ($order['status'] == 'pending') $badge_class = 'bg-warning text-dark';
+                                            elseif ($order['status'] == 'processing') $badge_class = 'bg-info text-white';
+                                            elseif ($order['status'] == 'completed') $badge_class = 'bg-success';
+                                            elseif ($order['status'] == 'cancelled') $badge_class = 'bg-danger';
                                         ?>
                                         <span class="badge <?= $badge_class ?>"><?= $order['status'] ?></span>
                                     </td>
@@ -119,10 +119,10 @@ $orders = $stmt->fetchAll();
                                             <input type="hidden" name="order_id" value="<?= $order['order_id'] ?>">
                                             <input type="hidden" name="update_status" value="1">
                                             <select name="status" class="form-select form-select-sm" style="width: 120px; display: inline-block;" onchange="this.form.submit()">
-                                                <option value="Pending" <?= $order['status'] == 'Pending' ? 'selected' : '' ?>>Chờ xử lý</option>
-                                                <option value="Processing" <?= $order['status'] == 'Processing' ? 'selected' : '' ?>>Đang giao</option>
-                                                <option value="Completed" <?= $order['status'] == 'Completed' ? 'selected' : '' ?>>Đã giao</option>
-                                                <option value="Cancelled" <?= $order['status'] == 'Cancelled' ? 'selected' : '' ?>>Hủy đơn</option>
+                                                <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>Chờ xử lý</option>
+                                                <option value="processing" <?= $order['status'] == 'processing' ? 'selected' : '' ?>>Đang giao</option>
+                                                <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>Đã giao</option>
+                                                <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>Hủy đơn</option>
                                             </select>
                                         </form>
                                         <a href="admin_order_detail.php?id=<?= $order['order_id'] ?>" class="btn btn-sm btn-outline-primary">Chi tiết</a>

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     $category_slug = trim($_POST['category_slug']);
 
     if ($category_name && $category_slug) {
-        $stmt = $pdo->prepare("INSERT INTO categories (category_name, category_slug) VALUES (?, ?)");
+        $stmt = $pdo->prepare("insert into categories (category_name, category_slug) values (?, ?)");
         if ($stmt->execute([$category_name, $category_slug])) {
             $message = '<div class="alert alert-success">Thêm danh mục thành công!</div>';
         } else {
@@ -22,19 +22,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
 // Xử lý xóa danh mục
 if (isset($_GET['delete'])) {
     $category_id = intval($_GET['delete']);
-    $stmt = $pdo->prepare("DELETE FROM categories WHERE category_id = ?");
+    $stmt = $pdo->prepare("delete from categories where category_id = ?");
     if ($stmt->execute([$category_id])) {
         $message = '<div class="alert alert-success">Xóa danh mục thành công!</div>';
     }
 }
 
 // Lấy danh sách danh mục
-$stmt = $pdo->query("SELECT * FROM categories");
+$stmt = $pdo->query("select * from categories");
 $categories = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,16 +43,62 @@ $categories = $stmt->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; padding: 20px 0; }
-        .sidebar .logo { text-align: center; color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px; }
-        .sidebar .nav-link { color: rgba(255,255,255,0.8); margin: 10px 0; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
-        .main-content { margin-left: 250px; padding: 30px; background: #f8f9fa; min-height: 100vh; }
-        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            padding: 20px 0;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 10px 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -95,10 +142,12 @@ $categories = $stmt->fetchAll();
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Slug (định danh URL)</label>
-                        <input type="text" name="category_slug" class="form-control" placeholder="e.g., van-hoc" required>
+                        <input type="text" name="category_slug" class="form-control" placeholder="e.g., van-hoc"
+                            required>
                     </div>
                     <div class="col-12">
-                        <button type="submit" name="add_category" class="btn btn-primary"><i class="bi bi-plus"></i> Thêm danh mục</button>
+                        <button type="submit" name="add_category" class="btn btn-primary"><i class="bi bi-plus"></i>
+                            Thêm danh mục</button>
                     </div>
                 </form>
             </div>
@@ -127,8 +176,10 @@ $categories = $stmt->fetchAll();
                                     <td><?= htmlspecialchars($cat['category_name']) ?></td>
                                     <td><code><?= htmlspecialchars($cat['category_slug']) ?></code></td>
                                     <td>
-                                        <a href="admin_edit_category.php?id=<?= $cat['category_id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="?delete=<?= $cat['category_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
+                                        <a href="admin_edit_category.php?id=<?= $cat['category_id'] ?>"
+                                            class="btn btn-sm btn-warning">Sửa</a>
+                                        <a href="?delete=<?= $cat['category_id'] ?>" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Bạn có chắc chắn?')">Xóa</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -141,4 +192,5 @@ $categories = $stmt->fetchAll();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

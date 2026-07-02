@@ -27,22 +27,22 @@ SET time_zone = "+00:00";
 -- Table structure for table `books`
 --
 
-CREATE TABLE `books` (
-  `book_id` int(11) NOT NULL,
-  `book_name` varchar(255) NOT NULL,
-  `author` varchar(150) NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `image_path` varchar(255) NOT NULL,
-  `category_id` int(11) DEFAULT NULL,
-  `is_best_seller` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `books` (
+  `book_id` int(11) not null,
+  `book_name` varchar(255) not null,
+  `author` varchar(150) not null,
+  `price` decimal(10,2) not null,
+  `image_path` varchar(255) not null,
+  `category_id` int(11) default null,
+  `is_best_seller` tinyint(1) default 0,
+  `created_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `category_id`, `is_best_seller`, `created_at`) VALUES
+insert into `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `category_id`, `is_best_seller`, `created_at`) values
 (1, 'Đắc Nhân Tâm', 'Dale Carnegie', 86000.00, 'images/dacnhantam.jpg', 5, 0, '2026-06-18 15:58:44'),
 (2, 'Nhà Giả Kim', 'Paulo Coelho', 79000.00, 'images/nhagiakim.jpg', 2, 0, '2026-06-18 15:58:44'),
 (3, 'Tuổi Trẻ Đáng Giá Bao Nhiêu', 'Rosie Nguyễn', 75000.00, 'images/tuoitredanggiabaonhieu.jpg', 5, 0, '2026-06-18 15:58:44'),
@@ -62,13 +62,13 @@ INSERT INTO `books` (`book_id`, `book_name`, `author`, `price`, `image_path`, `c
 -- Table structure for table `carts`
 --
 
-CREATE TABLE `carts` (
-  `cart_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `book_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL DEFAULT 1,
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `carts` (
+  `cart_id` int(11) not null,
+  `user_id` int(11) not null,
+  `book_id` int(11) not null,
+  `quantity` int(11) not null default 1,
+  `added_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -76,17 +76,17 @@ CREATE TABLE `carts` (
 -- Table structure for table `categories`
 --
 
-CREATE TABLE `categories` (
-  `category_id` int(11) NOT NULL,
-  `category_slug` varchar(50) NOT NULL,
-  `category_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `categories` (
+  `category_id` int(11) not null,
+  `category_slug` varchar(100) not null unique,
+  `category_name` varchar(150) not null
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`category_id`, `category_slug`, `category_name`) VALUES
+insert into `categories` (`category_id`, `category_slug`, `category_name`) values
 (1, 'tre-em', 'Trẻ em'),
 (2, 'van-hoc', 'Văn học & Tiểu thuyết'),
 (3, 'kinh-te', 'Kinh tế - Kinh doanh'),
@@ -100,20 +100,20 @@ INSERT INTO `categories` (`category_id`, `category_slug`, `category_name`) VALUE
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
-  `username` varchar(100) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `full_name` varchar(150) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+create table `users` (
+  `user_id` int(11) not null,
+  `username` varchar(100) not null unique,
+  `email` varchar(150) not null unique,
+  `password_hash` varchar(255) not null,
+  `full_name` varchar(255) default null,
+  `created_at` timestamp not null default current_timestamp()
+) engine=innodb default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `created_at`) VALUES
+insert into `users` (`user_id`, `username`, `email`, `password_hash`, `full_name`, `created_at`) values
 (1, 'kkkkk', 'khoip8500@gmail.com', '$2y$10$2xuhz4AYMFwUykm17keGgO4w3jUHMBIJSnOTq7F9c4UZZp7K68WkG', 'kkkkk', '2026-06-18 16:32:08');
 
 --
@@ -123,32 +123,32 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `full_name
 --
 -- Indexes for table `books`
 --
-ALTER TABLE `books`
-  ADD PRIMARY KEY (`book_id`),
-  ADD KEY `category_id` (`category_id`);
+alter table `books`
+  add primary key (`book_id`),
+  add key `category_id` (`category_id`);
 
 --
 -- Indexes for table `carts`
 --
-ALTER TABLE `carts`
-  ADD PRIMARY KEY (`cart_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `book_id` (`book_id`);
+alter table `carts`
+  add primary key (`cart_id`),
+  add key `user_id` (`user_id`),
+  add key `book_id` (`book_id`);
 
 --
 -- Indexes for table `categories`
 --
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`category_id`),
-  ADD UNIQUE KEY `category_slug` (`category_slug`);
+alter table `categories`
+  add primary key (`category_id`),
+  add unique key `category_slug` (`category_slug`);
 
 --
 -- Indexes for table `users`
 --
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
+alter table `users`
+  add primary key (`user_id`),
+  add unique key `username` (`username`),
+  add unique key `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -157,26 +157,26 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT for table `books`
 --
-ALTER TABLE `books`
-  MODIFY `book_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+alter table `books`
+  modify `book_id` int(11) not null auto_increment, auto_increment=13;
 
 --
 -- AUTO_INCREMENT for table `carts`
 --
-ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
+alter table `carts`
+  modify `cart_id` int(11) not null auto_increment;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
-ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+alter table `categories`
+  modify `category_id` int(11) not null auto_increment, auto_increment=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
-ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+alter table `users`
+  modify `user_id` int(11) not null auto_increment, auto_increment=2;
 
 --
 -- Constraints for dumped tables
@@ -185,15 +185,15 @@ ALTER TABLE `users`
 --
 -- Constraints for table `books`
 --
-ALTER TABLE `books`
-  ADD CONSTRAINT `books_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE SET NULL;
+alter table `books`
+  add constraint `books_ibfk_1` foreign key (`category_id`) references `categories` (`category_id`) on delete set null;
 
 --
 -- Constraints for table `carts`
 --
-ALTER TABLE `carts`
-  ADD CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`) ON DELETE CASCADE;
+alter table `carts`
+  add constraint `carts_ibfk_1` foreign key (`user_id`) references `users` (`user_id`) on delete cascade,
+  add constraint `carts_ibfk_2` foreign key (`book_id`) references `books` (`book_id`) on delete cascade;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
