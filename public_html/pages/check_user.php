@@ -7,4 +7,3 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?error=Bạn cần đăng nhập để sử dụng giỏ hàng");
     exit;
 }
-?>

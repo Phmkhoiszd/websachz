@@ -1,7 +1,10 @@
 <?php
-require_once 'check_user.php';
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php?error=Bạn cần đăng nhập để sử dụng giỏ hàng");
+    exit();
+}
 require_once 'db.php';
-
 $user_id = $_SESSION['user_id'];
 $book_id = isset($_POST['book_id']) ? intval($_POST['book_id']) : 0;
 
@@ -21,4 +24,3 @@ if ($book_id > 0) {
 
 header('Location: ../index.php');
 exit;
-?>
