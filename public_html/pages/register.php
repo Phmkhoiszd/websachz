@@ -5,14 +5,12 @@ $success_message = "";
 
 // 2. Chỉ xử lý dữ liệu khi người dùng bấm nút submit (Gửi dữ liệu dạng POST)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $host = 'localhost';
-    $dbname = 'worldofbook';
-    $username = 'root';
-    $password = '';
+    // 3. Kết nối Database
+    require_once 'db.php';
 
     try {
-        $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Lấy dữ liệu từ form và loại bỏ khoảng trắng thừa
         $user = trim($_POST['username']);
@@ -20,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $pass = $_POST['password'];
 
         // Kiểm tra xem Username hoặc Email đã tồn tại trong Hệ thống chưa
-        $stmt_check = $conn->prepare("select * from users where username = :username or email = :email");
+        $stmt_check = $pdo->prepare("select * from users where username = :username or email = :email");
         $stmt_check->execute(['username' => $user, 'email' => $email]);
 
         if ($stmt_check->rowCount() > 0) {
@@ -30,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
             // Chèn dữ liệu tài khoản mới vào bảng Users
-            $stmt_insert = $conn->prepare("insert into users (username, email, password_hash, full_name, role) values (:username, :email, :password_hash, :full_name, :role)");
+            $stmt_insert = $pdo->prepare("insert into users (username, email, password_hash, full_name, role) values (:username, :email, :password_hash, :full_name, :role)");
             $stmt_insert->execute([
                 'username' => $user,
                 'email' => $email,

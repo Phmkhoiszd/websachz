@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/pages/config.php';
 
 // 3. Lấy danh sách Thể loại sách để đổ vào menu
-$stmt_categories = $conn->prepare("select * from categories");
+$stmt_categories = $pdo->prepare("select * from categories");
 $stmt_categories->execute();
 $categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
 
@@ -13,14 +13,14 @@ $categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
 $query_books = "select books.*, categories.category_slug 
                 from books 
                 left join categories on books.category_id = categories.category_id";
-$stmt_books = $conn->prepare($query_books);
+$stmt_books = $pdo->prepare($query_books);
 $stmt_books->execute();
 $books = $stmt_books->fetchAll(PDO::FETCH_ASSOC);
 
 $cartCount = 0;
 $cartPreview = [];
 if (isset($_SESSION['user_id'])) {
-    $stmt_cart = $conn->prepare("select c.quantity, b.book_name, b.price, b.image_path from carts c join books b on c.book_id = b.book_id where c.user_id = ?");
+    $stmt_cart = $pdo->prepare("select c.quantity, b.book_name, b.price, b.image_path from carts c join books b on c.book_id = b.book_id where c.user_id = ?");
     $stmt_cart->execute([$_SESSION['user_id']]);
     $cartPreview = $stmt_cart->fetchAll(PDO::FETCH_ASSOC);
     $cartCount = count($cartPreview);
@@ -211,7 +211,8 @@ if (isset($_SESSION['user_id'])) {
                                         <div class="flex-grow-1">
                                             <div class="fw-bold small mb-1"><?= htmlspecialchars($item['book_name']) ?></div>
                                             <div class="small text-muted">x<?= $item['quantity'] ?> •
-                                                <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ</div>
+                                                <?= number_format($item['price'] * $item['quantity'], 0, ',', '.') ?> đ
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -379,7 +380,8 @@ if (isset($_SESSION['user_id'])) {
 
                                 <div class="card-body p-2 text-center d-flex flex-column justify-content-between">
                                     <div class="text-truncate fw-bold small text-dark mb-1">
-                                        <?= htmlspecialchars($book['book_name']) ?></div>
+                                        <?= htmlspecialchars($book['book_name']) ?>
+                                    </div>
                                     <div>
                                         <div class="text-danger fw-bold fs-5 mb-2">
                                             <?= number_format($gia_ban, 0, ',', '.') ?><span class="fs-6">đ</span>
@@ -394,7 +396,7 @@ if (isset($_SESSION['user_id'])) {
                                     </div>
                                 </div>
                             </div>
-                        <?php
+                            <?php
                         endforeach;
                     else:
                         ?>
@@ -440,7 +442,8 @@ if (isset($_SESSION['user_id'])) {
                             <div class="card-body text-center d-flex flex-column justify-content-between">
                                 <div>
                                     <h5 class="card-title fs-6 fw-bold mb-1 book-name text-truncate-2">
-                                        <?= htmlspecialchars($book['book_name']) ?></h5>
+                                        <?= htmlspecialchars($book['book_name']) ?>
+                                    </h5>
                                     <p class="text-muted small mb-2 book-author"><?= htmlspecialchars($book['author']) ?></p>
                                     <input type="hidden" class="book-id" value="<?= $book['book_id'] ?>">
                                 </div>

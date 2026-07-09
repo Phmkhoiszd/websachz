@@ -6,21 +6,16 @@ $error_message = "";
 
 // 2. Chỉ xử lý khi người dùng ấn nút ĐĂNG NHẬP (Gửi dữ liệu POST)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $host = 'localhost';
-    $dbname = 'worldofbook';
-    $username_db = 'root';
-    $password_db = '';
-
+    // 3. Kết nối Database
+    require_once 'db.php';
     try {
-        $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username_db, $password_db);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Lấy thông tin từ form
         $user_input = trim($_POST['username']);
         $password_input = $_POST['password'];
 
         // Kiểm tra xem dữ liệu nhập vào là Username hay Email (Sử dụng hàm LOWER để tránh lệch chữ hoa thường)
-        $stmt = $conn->prepare("select * from users where lower(username) = lower(:user_input) or lower(email) = lower(:user_input)");
+        $stmt = $pdo->prepare("select * from users where lower(username) = lower(:user_input) or lower(email) = lower(:user_input)");
         $stmt->execute(['user_input' => $user_input]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
