@@ -63,6 +63,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS bổ sung để nút con mắt trông gọn gàng và không bị viền thô */
+        .toggle-password {
+            cursor: pointer;
+            border-left: none;
+        }
+        .toggle-password:hover {
+            background-color: #e9ecef !important;
+        }
+    </style>
 </head>
 
 <body class="d-flex align-items-center justify-content-center">
@@ -86,8 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Tên tài khoản hoặc Email</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i
-                                class="bi bi-person text-muted"></i></span>
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
                         <input type="text" name="username" class="form-control bg-light border-start-0"
                             id="loginUsername" placeholder="Nhập tên tài khoản hoặc email" required>
                     </div>
@@ -96,10 +105,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="mb-4">
                     <label class="form-label fw-bold small text-secondary">Mật khẩu</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i
-                                class="bi bi-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control bg-light border-start-0"
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                        
+                        <input type="password" name="password" class="form-control bg-light border-start-0 border-end-0"
                             id="loginPassword" placeholder="Nhập mật khẩu của bạn" required>
+                        
+                        <span class="input-group-text bg-light toggle-password" id="togglePasswordBtn">
+                            <i class="bi bi-eye-slash text-muted" id="togglePasswordIcon"></i>
+                        </span>
                     </div>
                     <div class="text-end mt-1">
                         <a href="#" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
@@ -109,13 +122,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3 btn-custom">Đăng Nhập</button>
 
                 <p class="text-center small text-muted mb-0">
-                    Chưa có tài khoản? <a href="register.php" class="fw-bold text-decoration-none text-primary">Đăng ký
-                        ngay</a>
+                    Chưa có tài khoản? <a href="register.php" class="fw-bold text-decoration-none text-primary">Đăng ký ngay</a>
                 </p>
             </form>
         </div>
     </div>
 
+    <script>
+        const passwordInput = document.getElementById('loginPassword');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+        togglePasswordBtn.addEventListener('click', function () {
+            // Kiểm tra kiểu hiện tại của input
+            if (passwordInput.type === 'password') {
+                // Đổi thành text để hiện mật khẩu
+                passwordInput.type = 'text';
+                // Đổi icon thành con mắt mở
+                togglePasswordIcon.classList.remove('bi-eye-slash');
+                togglePasswordIcon.classList.add('bi-eye');
+            } else {
+                // Đổi lại thành password để ẩn mật khẩu
+                passwordInput.type = 'password';
+                // Đổi icon thành con mắt gạch chéo
+                togglePasswordIcon.classList.remove('bi-eye');
+                togglePasswordIcon.classList.add('bi-eye-slash');
+            }
+        });
+    </script>
 </body>
 
 </html>

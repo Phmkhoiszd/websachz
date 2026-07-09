@@ -9,34 +9,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once 'db.php';
 
     try {
-
         // Lấy dữ liệu từ form và loại bỏ khoảng trắng thừa
         $user = trim($_POST['username']);
         $email = trim($_POST['email']);
         $pass = $_POST['password'];
+        $confirm_pass = $_POST['confirm_password']; // Lấy thêm trường xác nhận mật khẩu
 
-        // Kiểm tra xem Username hoặc Email đã tồn tại trong Hệ thống chưa
-        $stmt_check = $pdo->prepare("select * from users where username = :username or email = :email");
-        $stmt_check->execute(['username' => $user, 'email' => $email]);
-
-        if ($stmt_check->rowCount() > 0) {
-            $error_message = "Tên đăng nhập hoặc Email này đã được sử dụng!";
+        // KIỂM TRA PHÍA SERVER: Xem 2 mật khẩu có khớp nhau không
+        if ($pass !== $confirm_pass) {
+            $error_message = "Mật khẩu xác nhận không khớp!";
         } else {
-            // Mã hóa mật khẩu bảo mật trước khi lưu vào Database
-            $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+            // Kiểm tra xem Username hoặc Email đã tồn tại trong Hệ thống chưa
+            $stmt_check = $pdo->prepare("select * from users where username = :username or email = :email");
+            $stmt_check->execute(['username' => $user, 'email' => $email]);
 
-            // Chèn dữ liệu tài khoản mới vào bảng Users
-            $stmt_insert = $pdo->prepare("insert into users (username, email, password_hash, full_name, role) values (:username, :email, :password_hash, :full_name, :role)");
-            $stmt_insert->execute([
-                'username' => $user,
-                'email' => $email,
-                'password_hash' => $hashed_password,
-                'full_name' => $user,
-                'role' => 'user'
-            ]);
+            if ($stmt_check->rowCount() > 0) {
+                $error_message = "Tên đăng nhập hoặc Email này đã được sử dụng!";
+            } else {
+                // Mã hóa mật khẩu bảo mật trước khi lưu vào Database
+                $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
-            $success_message = "Đăng ký thành công! Đang chuyển hướng sang trang đăng nhập...";
-            header("refresh:2;url=login.php");
+                // Chèn dữ liệu tài khoản mới vào bảng Users
+                $stmt_insert = $pdo->prepare("insert into users (username, email, password_hash, full_name, role) values (:username, :email, :password_hash, :full_name, :role)");
+                $stmt_insert->execute([
+                    'username' => $user,
+                    'email' => $email,
+                    'password_hash' => $hashed_password,
+                    'full_name' => $user,
+                    'role' => 'user'
+                ]);
+
+                $success_message = "Đăng ký thành công! Đang chuyển hướng sang trang đăng nhập...";
+                header("refresh:2;url=login.php");
+            }
         }
     } catch (PDOException $e) {
         $error_message = "Lỗi hệ thống (SQL): " . $e->getMessage();
@@ -54,6 +59,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS bổ sung giúp nút con mắt hiển thị đẹp mắt và mượt mà hơn */
+        .toggle-password {
+            cursor: pointer;
+            border-left: none;
+        }
+        .toggle-password:hover {
+            background-color: #e9ecef !important;
+        }
+    </style>
 </head>
 
 <body class="d-flex align-items-center justify-content-center">
@@ -83,31 +98,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Tên đăng nhập</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i
-                                class="bi bi-person text-muted"></i></span>
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
                         <input type="text" name="username" class="form-control bg-light border-start-0"
-                            placeholder="Ít nhất 5 ký tự" minlength="5" required>
+                            placeholder="Ít nhất 5 ký tự" minlength="5" value="<?= isset($user) ? htmlspecialchars($user) : '' ?>" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Địa chỉ Email</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i
-                                class="bi bi-envelope text-muted"></i></span>
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
                         <input type="email" name="email" class="form-control bg-light border-start-0"
-                            placeholder="viethung@example.com" required>
+                            placeholder="viethung@example.com" value="<?= isset($email) ? htmlspecialchars($email) : '' ?>" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Mật khẩu</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i
-                                class="bi bi-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control bg-light border-start-0"
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                        <input type="password" name="password" id="password" class="form-control bg-light border-start-0 border-end-0"
                             placeholder="Tối thiểu 8 ký tự" minlength="8" required>
+                        <span class="input-group-text bg-light toggle-password" data-target="password">
+                            <i class="bi bi-eye-slash text-muted"></i>
+                        </span>
                     </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Xác nhận mật khẩu</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock-fill text-muted"></i></span>
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control bg-light border-start-0 border-end-0"
+                            placeholder="Nhập lại mật khẩu chính xác" required>
+                        <span class="input-group-text bg-light toggle-password" data-target="confirm_password">
+                            <i class="bi bi-eye-slash text-muted"></i>
+                        </span>
+                    </div>
+                    <div id="passwordFeedback" class="invalid-feedback small mt-1">Mật khẩu xác nhận không khớp!</div>
                 </div>
 
                 <div class="form-check mb-4">
@@ -120,13 +148,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 mb-3 btn-register">Đăng ký</button>
 
                 <p class="text-center small text-muted mb-0">
-                    Đã có tài khoản rồi? <a href="login.php" class="fw-bold text-decoration-none text-primary">Đăng nhập
-                        ngay</a>
+                    Đã có tài khoản rồi? <a href="login.php" class="fw-bold text-decoration-none text-primary">Đăng nhập ngay</a>
                 </p>
             </form>
         </div>
     </div>
 
+    <script>
+    const form = document.getElementById('mainRegisterForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const feedback = document.getElementById('passwordFeedback');
+
+    // =======================================================
+    // FIX LỖI: Xử lý ẩn/hiện mật khẩu ĐỘC LẬP cho từng ô
+    // =======================================================
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            // Tìm ngược lại ô input nằm NGAY TRƯỚC nút con mắt được bấm
+            const input = this.previousElementSibling; 
+            const icon = this.querySelector('i');
+
+            if (input && (input.type === 'password' || input.type === 'text')) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
+            }
+        });
+    });
+
+    // =======================================================
+    // Kiểm tra mật khẩu trùng khớp
+    // =======================================================
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Invalid");
+            confirmPassword.classList.add('is-invalid');
+            feedback.style.display = 'block';
+        } else {
+            confirmPassword.setCustomValidity("");
+            confirmPassword.classList.remove('is-invalid');
+            feedback.style.display = 'none';
+        }
+    }
+
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+
+    form.addEventListener('submit', function(event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            validatePassword();
+        }
+    });
+</script>
 </body>
 
 </html>
