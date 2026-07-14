@@ -484,12 +484,6 @@ if (isset($_SESSION['user_id'])) {
                 </div>
             <?php endif; ?>
         </div>
-
-        <div class="text-center mt-5">
-            <button class="btn btn-outline-primary px-5 py-2 fw-bold shadow-sm">
-                Xem thêm sản phẩm <i class="bi bi-arrow-down-short fs-5 align-middle"></i>
-            </button>
-        </div>
     </div>
 
     <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel"

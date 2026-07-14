@@ -2,13 +2,13 @@
 
 // db.php
 
-$host = 'sql312.infinityfree.com';
+$host = 'localhost';
 
-$db = 'if0_42275753_worldofbook';
+$db = 'worldofbook';
 
-$user = 'if0_42275753';
+$user = 'root';
 
-$pass = 'uZIlRHNFZTFadO'; // Để trống nếu dùng XAMPP mặc định
+$pass = ''; // Để trống nếu dùng XAMPP mặc định
 
 $charset = 'utf8mb4';
 
