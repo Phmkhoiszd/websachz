@@ -148,7 +148,7 @@ $categories = $stmt->fetchAll();
                 <h5 class="mb-0">Thông tin Sách</h5>
             </div>
             <div class="card-body">
-                <form method="POST" class="row g-3">
+                <form method="POST" enctype="multipart/form-data" class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Tên sách</label>
                         <input type="text" name="book_name" class="form-control"
@@ -176,9 +176,9 @@ $categories = $stmt->fetchAll();
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Đường dẫn hình ảnh</label>
-                        <input type="text" name="image_path" class="form-control"
-                            value="<?= htmlspecialchars($book['image_path']) ?>" required>
+                        <label class="form-label">Ảnh sách</label>
+                        <input type="file" name="image_file" class="form-control" accept="image/*">
+                        <div class="form-text">Chọn ảnh mới nếu muốn thay đổi. Nếu không chọn, ảnh hiện tại sẽ được giữ.</div>
                     </div>
                     <div class="col-12">
                         <button type="submit" name="update_book" class="btn btn-primary"><i class="bi bi-save"></i> Cập
