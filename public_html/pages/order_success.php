@@ -42,7 +42,7 @@ if (!$order) {
                 <p class="mb-4"><strong>Tổng tiền:</strong> <?= number_format($order['total_amount'], 0, ',', '.') ?> đ
                 </p>
                 <a href="../index.php" class="btn btn-primary me-2">Về trang chủ</a>
-                <a href="admin_order_detail.php?id=<?= $order['order_id'] ?>" class="btn btn-outline-secondary">Xem chi
+                <a href="order_detail.php?id=<?= $order['order_id'] ?>" class="btn btn-outline-secondary">Xem chi
                     tiết</a>
             </div>
         </div>
