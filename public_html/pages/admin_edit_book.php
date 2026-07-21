@@ -26,16 +26,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_book'])) {
     $author = trim($_POST['author']);
     $price = floatval($_POST['price']);
     $category_id = intval($_POST['category_id']);
-    $image_path = trim($_POST['image_path']);
+
+    // Mặc định giữ lại đường dẫn ảnh cũ nếu không chọn ảnh mới
+    $image_path = $book['image_path'];
+
+    // Xử lý upload file ảnh mới (nếu có chọn)
+    if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../images/';
+        $file_name = time() . '_' . basename($_FILES['image_file']['name']);
+        $target_file = $upload_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], $target_file)) {
+            $image_path = 'images/' . $file_name; // Cập nhật đường dẫn mới vào DB
+
+            // Xóa file ảnh cũ khỏi server để tiết kiệm dung lượng (tùy chọn)
+            if (!empty($book['image_path']) && file_exists('../' . $book['image_path'])) {
+                unlink('../' . $book['image_path']);
+            }
+        } else {
+            $message = '<div class="alert alert-danger">Lỗi: Không thể lưu file ảnh mới!</div>';
+        }
+    }
 
     if ($book_name && $author && $price > 0) {
         $stmt = $pdo->prepare("update books set book_name = ?, author = ?, price = ?, category_id = ?, image_path = ? where book_id = ?");
         if ($stmt->execute([$book_name, $author, $price, $category_id, $image_path, $book_id])) {
             $message = '<div class="alert alert-success">Cập nhật sách thành công!</div>';
-            // Reload book data
+            // Tải lại dữ liệu sách sau khi cập nhật
             $stmt = $pdo->prepare("select * from books where book_id = ?");
             $stmt->execute([$book_id]);
             $book = $stmt->fetch();
+        } else {
+            $message = '<div class="alert alert-danger">Lỗi cơ sở dữ liệu!</div>';
         }
     }
 }
@@ -178,7 +200,8 @@ $categories = $stmt->fetchAll();
                     <div class="col-md-4">
                         <label class="form-label">Ảnh sách</label>
                         <input type="file" name="image_file" class="form-control" accept="image/*">
-                        <div class="form-text">Chọn ảnh mới nếu muốn thay đổi. Nếu không chọn, ảnh hiện tại sẽ được giữ.</div>
+                        <div class="form-text">Chọn ảnh mới nếu muốn thay đổi. Nếu không chọn, ảnh hiện tại sẽ được giữ.
+                        </div>
                     </div>
                     <div class="col-12">
                         <button type="submit" name="update_book" class="btn btn-primary"><i class="bi bi-save"></i> Cập

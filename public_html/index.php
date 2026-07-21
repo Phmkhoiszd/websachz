@@ -638,6 +638,43 @@ if (isset($_SESSION['user_id'])) {
                     handleFiltering(filterValue, this.textContent.trim());
                 });
             });
+            // --- LOGIC TÌM KIẾM SÁCH THEO THỜI GIAN THỰC (REAL-TIME SEARCH) ---
+const searchDesktop = document.getElementById('searchDesktop');
+const searchMobile = document.getElementById('searchMobile');
+
+function filterBooksByKeyword(keyword) {
+    const term = keyword.toLowerCase().trim();
+    const bookItems = document.querySelectorAll('.book-item');
+
+    bookItems.forEach(item => {
+        // Lấy tên sách và tên tác giả trong card
+        const title = item.querySelector('.book-name') ? item.querySelector('.book-name').textContent.toLowerCase() : '';
+        const author = item.querySelector('.book-author') ? item.querySelector('.book-author').textContent.toLowerCase() : '';
+
+        // Nếu từ khóa xuất hiện trong Tên sách hoặc Tác giả -> Hiển thị
+        if (title.includes(term) || author.includes(term)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Lắng nghe sự kiện gõ phím ở ô tìm kiếm Desktop
+if (searchDesktop) {
+    searchDesktop.addEventListener('input', function () {
+        filterBooksByKeyword(this.value);
+        if (searchMobile) searchMobile.value = this.value; // Đồng bộ với ô mobile
+    });
+}
+
+// Lắng nghe sự kiện gõ phím ở ô tìm kiếm Mobile
+if (searchMobile) {
+    searchMobile.addEventListener('input', function () {
+        filterBooksByKeyword(this.value);
+        if (searchDesktop) searchDesktop.value = this.value; // Đồng bộ với ô desktop
+    });
+}
         });
     </script>
 </body>
