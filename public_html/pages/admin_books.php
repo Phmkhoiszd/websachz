@@ -10,12 +10,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_book'])) {
     $author = trim($_POST['author']);
     $price = floatval($_POST['price']);
     $category_id = intval($_POST['category_id']);
-    $image_path = trim($_POST['image_path']);
 
-    if ($book_name && $author && $price > 0) {
+    $image_path = '';
+
+    // Xử lý upload file ảnh
+    if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
+        // Thư mục đích (do file đang ở /pages/ nên cần lùi lại một cấp bằng ../)
+        $upload_dir = '../images/';
+
+        // Đổi tên file để tránh trùng lặp
+        $file_name = time() . '_' . basename($_FILES['image_file']['name']);
+        $target_file = $upload_dir . $file_name;
+
+        // Upload file
+        if (move_uploaded_file($_FILES['image_file']['tmp_name'], $target_file)) {
+            // Cắt ../ đi để lưu vào DB đường dẫn dạng images/ten_file.jpg (chuẩn với frontend)
+            $image_path = 'images/' . $file_name;
+        } else {
+            $message = '<div class="alert alert-danger">Lỗi: Không thể lưu file ảnh!</div>';
+        }
+    } else {
+        $message = '<div class="alert alert-danger">Vui lòng chọn ảnh!</div>';
+    }
+
+    if ($book_name && $author && $price > 0 && $image_path) {
         $stmt = $pdo->prepare("insert into books (book_name, author, price, category_id, image_path) values (?, ?, ?, ?, ?)");
         if ($stmt->execute([$book_name, $author, $price, $category_id, $image_path])) {
             $message = '<div class="alert alert-success">Thêm sách thành công!</div>';
+        } else {
+            $message = '<div class="alert alert-danger">Lỗi cơ sở dữ liệu!</div>';
         }
     }
 }
